@@ -9,6 +9,11 @@ app = Flask(__name__)
 tesseract_cmd_path = r"D:\Program Files\Tesseract-OCR\tesseract.exe"
 pytesseract.pytesseract.tesseract_cmd = tesseract_cmd_path
 
+@app.route('/test')
+def test():
+    return 'Rota de teste funcionando!'
+
+
 # Servir arquivos estáticos (CSS, JS)
 @app.route('/<path:filename>')
 def serve_static(filename):
@@ -46,6 +51,11 @@ def extract_text():
     os.remove(image_path)
 
     return jsonify({"text": texto})
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 
 if __name__ == "__main__":
     if not os.path.exists('temp'):
