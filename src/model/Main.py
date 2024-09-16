@@ -1,33 +1,29 @@
-from flask import Flask, request, jsonify, send_from_directory
+import os
+from flask import Flask, render_template, request, jsonify
 import pytesseract
 import cv2
-import os
 
-app = Flask(__name__)
+# Configurando o Flask p pegar os arquivos nas pastas certas
+app = Flask(__name__,
+            template_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'templates'),
+            static_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'static'))
 
-# Defina o caminho do executável Tesseract-OCR
+# Definir o caminho do Tesseract-OCR
 tesseract_cmd_path = r"D:\Program Files\Tesseract-OCR\tesseract.exe"
 pytesseract.pytesseract.tesseract_cmd = tesseract_cmd_path
 
-#@app.route('/test')
-#def test():
-#    return 'Rota de teste funcionando!'
+# Criação do diretório temp p deixar as fotos temporaria e usar menos memoria
+temp_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'temp')
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
 
-
-# Servir arquivos estáticos (CSS, JS)
-@app.route('/<path:filename>')
-def serve_static(filename):
-    try:
-        return send_from_directory('static', filename)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
+# Rota principal p mostrsa o arquivo webView.html
 @app.route('/')
 def index():
     print("Acessando a rota principal /")
-    return send_from_directory('static', 'webView.html')
+    return render_template('webView.html')
 
+# Rota para extrair o texto da imagem
 @app.route('/extract-text', methods=['POST'])
 def extract_text():
     if 'image' not in request.files:
@@ -38,7 +34,7 @@ def extract_text():
         return jsonify({"error": "Arquivo inválido!"}), 400
     
     # Salvar a imagem temporariamente
-    image_path = os.path.join("temp", image_file.filename)
+    image_path = os.path.join(temp_dir, image_file.filename)
     image_file.save(image_path)
 
     # Ler a imagem com OpenCV
@@ -52,12 +48,5 @@ def extract_text():
 
     return jsonify({"text": texto})
 
-#@app.route('/favicon.ico')
-#def favicon():
-#    return '', 204
-
-
 if __name__ == "__main__":
-    if not os.path.exists('temp'):
-        os.makedirs('temp')
     app.run(debug=True)
