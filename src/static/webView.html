@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOME DO PROJETO</title>
+    <link rel="stylesheet" href="webView.css">
+</head>
+<body>
+    <header>
+        <h1>NOME DO PROJETO</h1>
+    </header>
+
+    <main>
+        <section id="image-viewer">
+            <h2>Visualizador de Imagem</h2>
+            <input type="file" id="imageInput" accept="image/*" onchange="loadImage(event)">
+            <img id="imageDisplay" alt="Sua imagem aparecerá aqui">
+        </section>
+
+        <section id="text-output">
+            <h2>Texto Extraído</h2>
+            <pre id="textExtracted">Texto extraído aparecerá aqui...</pre>
+        </section>
+    </main>
+
+    <script src="webView.js"></script>
+</body>
+</html>
