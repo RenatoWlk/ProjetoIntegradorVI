@@ -12,10 +12,15 @@ pytesseract.pytesseract.tesseract_cmd = tesseract_cmd_path
 # Servir arquivos estáticos (CSS, JS)
 @app.route('/<path:filename>')
 def serve_static(filename):
-    return send_from_directory('static', filename)
+    try:
+        return send_from_directory('static', filename)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/')
 def index():
+    print("Acessando a rota principal /")
     return send_from_directory('static', 'webView.html')
 
 @app.route('/extract-text', methods=['POST'])
