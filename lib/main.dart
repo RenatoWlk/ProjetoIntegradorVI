@@ -1,15 +1,23 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'screens/home_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
 import 'routes/app_routes.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final cameras = await availableCameras();
+  final firstCamera = cameras.first;
+
+  runApp(App(camera: firstCamera));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  final CameraDescription camera;
+
+  const App({super.key, required this.camera});
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +26,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: const LoginScreen(),
-      routes: AppRoutes.define(),
+      home: HomeScreen(camera: camera),
+      routes: AppRoutes.define(camera),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

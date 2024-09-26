@@ -13,8 +13,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   flutter_tesseract_ocr: ^0.4.0
-  image_picker: ^0.8.7+3
-  google_ml_kit: ^0.11.0
+  camera: ^0.11.0+2
+  path_provider: ^2.1.4
+  path: ^1.9.0
+  image: ^4.2.0
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +25,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/tessdata_config.json
+    - assets/tessdata/eng.traineddata
+    - assets/tessdata/por.traineddata
 
   # To add assets to your application, add an assets section, like this:
   # assets:
