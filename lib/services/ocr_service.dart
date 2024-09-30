@@ -11,6 +11,9 @@ class OCRService {
       language: "por",
       args: {
         "preserve_interword_spaces": "1",
+        "psm": "6", // psm 3, 4 e 6 são os melhores p/ nota fiscal
+        "textord_tabfind_find_tables": "1",
+        "tessedit_char_whitelist": "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\$.,% /" // Caracteres que o OCR busca
       },
     );
   }
