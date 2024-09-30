@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'routes/app_routes.dart';
@@ -10,6 +11,7 @@ import 'providers/ocr_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MongoDatabase.connect();
   final cameras = await availableCameras();
   final firstCamera = cameras.first;
 
