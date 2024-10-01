@@ -99,8 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snapshot.connectionState == ConnectionState.done) {
           // Definindo o tamanho da câmera
           return SizedBox(
-            height: 500, // Defina a altura que você deseja para a câmera
-            width: MediaQuery.of(context).size.width * 0.9, // Largura ajustada, 90% da tela
+            height: 500,
+            width: MediaQuery.of(context).size.width * 0.9,
             child: const CameraPreviewWidget(),
           );
         } else {
