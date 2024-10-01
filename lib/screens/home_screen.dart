@@ -40,7 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 200),
+                const SizedBox(height: 30),
+                _buildHeader(),
+                const SizedBox(height: 30),
                 _buildTitleText(),
                 const SizedBox(height: 30),
                 _buildCameraPreview(context, cameraService),
@@ -48,15 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildExtractedText(ocrProvider.extractedText),
                 const SizedBox(height: 200)
               ],
-            ),
-          ),
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: _buildHeader(),
             ),
           ),
           Positioned(
@@ -104,7 +97,12 @@ class _HomeScreenState extends State<HomeScreen> {
       future: _initializeCameraFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return const CameraPreviewWidget();
+          // Definindo o tamanho da câmera
+          return SizedBox(
+            height: 500, // Defina a altura que você deseja para a câmera
+            width: MediaQuery.of(context).size.width * 0.9, // Largura ajustada, 90% da tela
+            child: const CameraPreviewWidget(),
+          );
         } else {
           return const Center(
             child: CircularProgressIndicator(),
@@ -113,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
   Widget _buildActionButtons(BuildContext context, CameraService cameraService, OCRService ocrService, OCRProvider ocrProvider) {
     return Row(
