@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         IconButton(
           icon: const Icon(Icons.person_outline, size: 40),
           onPressed: () {
-            // Lógica para abrir o perfil
+            Navigator.of(context).pushReplacementNamed('/login');
           },
         ),
       ],
