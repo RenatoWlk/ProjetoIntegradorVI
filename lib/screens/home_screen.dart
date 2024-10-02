@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
@@ -63,16 +62,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Header igual ao da outra página (com ícones de menu e perfil e o título centralizado)
   Widget _buildHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        FloatingActionButton(
+        IconButton(
+          icon: const Icon(Icons.menu, size: 40),
           onPressed: () {
-            // TODO: Abrir o menu lateral
+            // Lógica para abrir o menu lateral
           },
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.person_outline, size: 50),
+        ),
+        const Text(
+          'Home',
+          style: TextStyle(
+            fontFamily: "Space Grotesk",
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.person_outline, size: 40),
+          onPressed: () {
+            // Lógica para abrir o perfil
+          },
         ),
       ],
     );
@@ -97,9 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
       future: _initializeCameraFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          // Definindo o tamanho da câmera
+          // Mantendo o tamanho da câmera grande (original)
           return SizedBox(
-            height: 500,
+            height: 500, // Tamanho original maior da câmera
             width: MediaQuery.of(context).size.width * 0.9,
             child: const CameraPreviewWidget(),
           );
@@ -112,22 +125,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildActionButtons(BuildContext context, CameraService cameraService, OCRService ocrService, OCRProvider ocrProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-
-        // BOTÃO DE LISTA DE COMPRAS ATUAL
+        // Botão de Lista de Compras
         FloatingActionButton(
           onPressed: () {
-            // TODO: botão que mostra a lista atual
+            Navigator.of(context).pushReplacementNamed('/list');
           },
           backgroundColor: Colors.white,
           child: const Icon(Icons.list_alt, size: 40),
         ),
 
-        // BOTÃO DE ESCANEAR
+        // Botão de Escanear
         FloatingActionButton(
           onPressed: () async {
             try {
@@ -142,10 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Icon(Icons.document_scanner, size: 40),
         ),
 
-        // BOTÃO DE HISTÓRICO DE COMPRAS
+        // Botão de Histórico
         FloatingActionButton(
           onPressed: () {
-            // TODO: botão histórico de compras
+            Navigator.of(context).pushReplacementNamed('/history');
           },
           backgroundColor: Colors.white,
           child: const Icon(Icons.history, size: 40),
