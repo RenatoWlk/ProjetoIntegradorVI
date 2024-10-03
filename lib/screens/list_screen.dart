@@ -1,72 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
+import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 
-class ShoppingListScreen extends StatelessWidget {
+class ListScreen extends StatelessWidget {
+  const ListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: _buildDrawer(context),
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0), // Adiciona padding similar ao da HomeScreen
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                const SizedBox(height: 30), // Espaço extra
-                _buildHeader(context), // Substituindo o AppBar pelo _buildHeader com padding
+                const SizedBox(height: 100),
+                _buildHeader(context),
                 const SizedBox(height: 30),
                 _buildProductList(),
-                const SizedBox(height: 30),
-                _buildActionButtons(context),
+                const SizedBox(height: 500),
               ],
             ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: _buildActionButtons(context),
           ),
         ],
       ),
     );
   }
 
-  // Método para construir o Header, substituindo o AppBar
   Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.menu, size: 40),
-          onPressed: () {
-            // Lógica para abrir o menu lateral
-          },
-        ),
-        const Text(
-          'Sua Lista',
-          style: TextStyle(
-            fontFamily: "Space Grotesk",
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
+        SizedBox(width: 20),
+        Expanded(
+          child: Text(
+            'Sua Lista',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Space Grotesk",
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-        IconButton(
-          icon: const Icon(Icons.person_outline, size: 40),
-          onPressed: () {
-            Navigator.of(context).pushNamed('/login');
-          },
-        ),
+        CustomDrawerButton(),
+        SizedBox(width: 20),
       ],
     );
   }
 
-  // Método para construir a lista de produtos
   Widget _buildProductList() {
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(), // Faz com que a lista role com a tela inteira
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      itemCount: 6, // Número de itens na lista
+      itemCount: 6,
       itemBuilder: (context, index) {
         return _buildProductItem();
       },
     );
   }
 
-  // Método para construir cada item da lista de produtos
   Widget _buildProductItem() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -109,36 +111,40 @@ class ShoppingListScreen extends StatelessWidget {
     );
   }
 
-  // Método para construir os botões de ação
   Widget _buildActionButtons(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          FloatingActionButton(
-            backgroundColor: Colors.orange,
-            onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/home');
-            },
-            child: const Icon(Icons.list_alt, size: 40),
-          ),
-          FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/home');
-            },
-            child: const Icon(Icons.document_scanner, size: 40),
-          ),
-          FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: () {
-              // Lógica para acessar o histórico de compras
-            },
-            child: const Icon(Icons.history, size: 40),
-          ),
-        ],
-      ),
+    return ActionButtons(
+      onListPressed: () {
+
+      },
+      onScanPressed: () {
+        Navigator.of(context).pushReplacementNamed('/home');
+      },
+      onHistoryPressed: () {
+        Navigator.of(context).pushReplacementNamed('/history');
+      },
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return CustomDrawer(
+      onNewListTap: () {
+        Navigator.pop(context);
+      },
+      onScanTap: () {
+        Navigator.of(context).pushReplacementNamed('/home');
+      },
+      onHistoryTap: () {
+        // Navigator.of(context).pushReplacementNamed('/history');
+        Navigator.pop(context);
+      },
+      onEditDataTap: () {
+        // TODO: Edição de dados
+        Navigator.pop(context);
+      },
+      onLogoutTap: () {
+        // TODO: Logout
+        Navigator.pop(context);
+      },
     );
   }
 }

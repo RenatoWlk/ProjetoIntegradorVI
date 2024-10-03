@@ -17,7 +17,7 @@ class AppRoutes {
       home: (context) => HomeScreen(camera: camera),
       login: (context) => const LoginScreen(),
       register: (context) => const RegisterScreen(),
-      list: (context) => ShoppingListScreen()
+      list: (context) => const ListScreen()
     };
   }
 }

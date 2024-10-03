@@ -14,12 +14,26 @@ class LoginScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 60),
 
-              // ICONE CARRINHO
-              const Icon(
-                Icons.shopping_cart_outlined,
-                size: 110,
-                color: Colors.black,
+              const Row(
+                children: [
+                  // ICONE CARRINHO
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 110,
+                    color: Colors.black,
+                  ),
+
+                  // TEXTO NOME DO APP
+                  Text('TEM QUE QUERÊ',
+                    style: TextStyle(
+                      fontFamily: "Space Grotesk",
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                ]
               ),
+
               const SizedBox(height: 20),
 
               // TEXTO BEM VINDO

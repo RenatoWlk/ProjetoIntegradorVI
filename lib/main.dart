@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:provider/provider.dart';
-import 'screens/home_screen.dart';
 import 'routes/app_routes.dart';
 import 'services/camera_service.dart';
 import 'services/ocr_service.dart';
@@ -38,11 +38,11 @@ class App extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        title: 'STORE SCAN',
+        title: 'TEM QUE QUERÊ',
         theme: ThemeData(
           primarySwatch: Colors.grey,
         ),
-        home: HomeScreen(camera: camera),
+        home: const LoginScreen(),
         routes: AppRoutes.define(camera),
         debugShowCheckedModeBanner: false,
       ),

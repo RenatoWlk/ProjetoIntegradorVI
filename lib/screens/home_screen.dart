@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:projeto_integrador_6/services/camera_service.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
+import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final ocrProvider = Provider.of<OCRProvider>(context);
 
     return Scaffold(
+      endDrawer: _buildDrawer(context),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -39,15 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
+                const SizedBox(height: 100),
                 _buildHeader(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
                 _buildTitleText(),
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
                 _buildCameraPreview(context, cameraService),
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
                 _buildExtractedText(ocrProvider.extractedText),
-                const SizedBox(height: 200)
+                const SizedBox(height: 500)
               ],
             ),
           ),
@@ -62,31 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Header igual ao da outra página (com ícones de menu e perfil e o título centralizado)
   Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.menu, size: 40),
-          onPressed: () {
-            // Lógica para abrir o menu lateral
-          },
-        ),
-        const Text(
-          'Home',
-          style: TextStyle(
-            fontFamily: "Space Grotesk",
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.person_outline, size: 40),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed('/login');
-          },
-        ),
+        CustomDrawerButton(),
       ],
     );
   }
@@ -110,9 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
       future: _initializeCameraFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          // Mantendo o tamanho da câmera grande (original)
           return SizedBox(
-            height: 500, // Tamanho original maior da câmera
+            height: 500,
             width: MediaQuery.of(context).size.width * 0.9,
             child: const CameraPreviewWidget(),
           );
@@ -126,42 +109,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, CameraService cameraService, OCRService ocrService, OCRProvider ocrProvider) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        // Botão de Lista de Compras
-        FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed('/list');
-          },
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.list_alt, size: 40),
-        ),
-
-        // Botão de Escanear
-        FloatingActionButton(
-          onPressed: () async {
-            try {
-              final image = await cameraService.captureImage();
-              String text = await ocrService.extractTextFromImage(image.path);
-              ocrProvider.updateExtractedText(text);
-            } catch (e) {
-              print('Erro capturando a imagem: $e');
-            }
-          },
-          backgroundColor: Colors.orange,
-          child: const Icon(Icons.document_scanner, size: 40),
-        ),
-
-        // Botão de Histórico
-        FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed('/history');
-          },
-          backgroundColor: Colors.white,
-          child: const Icon(Icons.history, size: 40),
-        ),
-      ],
+    return ActionButtons(
+        onListPressed: () {
+          Navigator.of(context).pushReplacementNamed('/list');
+        },
+        onScanPressed: () async {
+          try {
+            final image = await cameraService.captureImage();
+            String text = await ocrService.extractTextFromImage(image.path);
+            ocrProvider.updateExtractedText(text);
+          } catch (e) {
+            print('Erro capturando a imagem: $e');
+          }
+        },
+        onHistoryPressed: () {
+          Navigator.of(context).pushReplacementNamed('/history');
+        },
     );
   }
 
@@ -172,6 +135,29 @@ class _HomeScreenState extends State<HomeScreen> {
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return CustomDrawer(
+      onNewListTap: () {
+        Navigator.of(context).pushReplacementNamed('/list');
+      },
+      onScanTap: () {
+        Navigator.pop(context);
+      },
+      onHistoryTap: () {
+        // Navigator.of(context).pushReplacementNamed('/history');
+        Navigator.pop(context);
+      },
+      onEditDataTap: () {
+        // TODO: Edição de dados
+        Navigator.pop(context);
+      },
+      onLogoutTap: () {
+        // TODO: Logout
+        Navigator.pop(context);
+      },
     );
   }
 }
