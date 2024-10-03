@@ -38,7 +38,7 @@ class App extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        title: 'Projeto Integrador VI',
+        title: 'STORE SCAN',
         theme: ThemeData(
           primarySwatch: Colors.grey,
         ),
