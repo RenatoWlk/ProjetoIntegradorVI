@@ -1,10 +1,9 @@
 import 'dart:developer';
-
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:projeto_integrador_6/services/database/constants.dart';
 
 class MongoDatabase {
-  static connect() async {
+  static Future<void> connect() async {
     try {
       var db = await Db.create(DB_URL);
       await db.open();
