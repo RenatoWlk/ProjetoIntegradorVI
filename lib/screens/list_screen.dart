@@ -37,7 +37,7 @@ class ListScreen extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         SizedBox(width: 20),
         Expanded(

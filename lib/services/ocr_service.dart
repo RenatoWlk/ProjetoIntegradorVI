@@ -1,20 +1,24 @@
 import 'dart:io';
-
-import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
-import 'package:projeto_integrador_6/utils/preprocess_image.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart'; // OCR
 
 class OCRService {
+  // Função para realizar OCR com o Google ML Kit
   Future<String> extractTextFromImage(String imagePath) async {
-    File processedImage = preprocessImage(imagePath);
-    return await FlutterTesseractOcr.extractText(
-      processedImage.path,
-      language: "por",
-      args: {
-        "preserve_interword_spaces": "1",
-        "psm": "6", // psm 3, 4 e 6 são os melhores p/ nota fiscal
-        "textord_tabfind_find_tables": "1",
-        "tessedit_char_whitelist": "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\$.,% /" // Caracteres que o OCR busca
-      },
-    );
+    final inputImage = InputImage.fromFilePath(imagePath);
+    final textRecognizer = TextRecognizer();
+
+    try {
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      String extractedText = recognizedText.text;
+
+      return extractedText;
+    } catch (e) {
+        print("Erro ao realizar OCR: $e");
+        return "Erro ao realizar OCR";
+    } finally {
+      // Fecha o textRecognizer para liberar recursos
+      textRecognizer.close();
+    }
   }
 }
+
