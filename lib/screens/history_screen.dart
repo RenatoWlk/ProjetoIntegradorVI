@@ -4,8 +4,8 @@ import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 
-class ListScreen extends StatelessWidget {
-  const ListScreen({super.key});
+class HistoryScreen extends StatelessWidget {
+  const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class ListScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildProductList(),
+                  _buildHistoryList(),
                 ],
               ),
             ),
@@ -43,7 +43,7 @@ class ListScreen extends StatelessWidget {
         SizedBox(width: 20),
         Expanded(
           child: Text(
-            'Sua Lista',
+            'Histórico',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "Space Grotesk",
@@ -58,26 +58,26 @@ class ListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductList() {
-    final products = [
-      {'name': 'Produto 1', 'price': '24,99'},
-      {'name': 'Produto 2', 'price': '12,99'},
-      {'name': 'Produto 3', 'price': '6,50'},
-      {'name': 'Produto 4', 'price': '16,99'},
+  Widget _buildHistoryList() {
+    final items = [
+      {'title': 'Lista + Comprados', 'date': ''},
+      {'title': 'Lista', 'date': '26/09/24'},
+      {'title': 'Lista', 'date': '26/09/24'},
+      {'title': 'Lista', 'date': '26/09/24'},
     ];
 
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: products.length,
+      itemCount: items.length,
       itemBuilder: (context, index) {
-        final product = products[index];
-        return _buildProductItem(product['name'] as String, product['price'] as String);
+        final item = items[index];
+        return _buildHistoryItem(item['title'] as String, item['date'] as String);
       },
     );
   }
 
-  Widget _buildProductItem(String name, String price) {
+  Widget _buildHistoryItem(String title, String date) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
@@ -90,28 +90,17 @@ class ListScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              name,
+              '$title ${date.isNotEmpty ? date : ''}',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Row(
-              children: [
-                Text(
-                  price.isNotEmpty ? price : '',
-                  style: const TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.cancel_outlined),
-                  onPressed: () {
-                    // TODO: Remover item da lista
-                  },
-                ),
-              ],
+            IconButton(
+              icon: const Icon(Icons.cancel_outlined),
+              onPressed: () {
+                // TODO: Remover item da lista
+              },
             ),
           ],
         ),
@@ -122,13 +111,13 @@ class ListScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return ActionButtons(
       onListPressed: () {
-
+        Navigator.of(context).pushReplacementNamed('/list');
       },
       onScanPressed: () {
         Navigator.of(context).pushReplacementNamed('/home');
       },
       onHistoryPressed: () {
-        Navigator.of(context).pushReplacementNamed('/history');
+
       },
     );
   }
@@ -136,13 +125,13 @@ class ListScreen extends StatelessWidget {
   Widget _buildDrawer(BuildContext context) {
     return CustomDrawer(
       onNewListTap: () {
-        Navigator.pop(context);
+        Navigator.of(context).pushReplacementNamed('/list');
       },
       onScanTap: () {
         Navigator.of(context).pushReplacementNamed('/home');
       },
       onHistoryTap: () {
-        Navigator.of(context).pushReplacementNamed('/history');
+        Navigator.pop(context);
       },
       onEditDataTap: () {
         // TODO: Edição de dados

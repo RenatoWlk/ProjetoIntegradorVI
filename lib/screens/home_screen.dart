@@ -1,13 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
+
+import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/services/camera_service.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
-import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -36,29 +38,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       endDrawer: _buildDrawer(context),
-      body: Stack(
+      body: Column(
         children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
-                _buildHeader(),
-                const SizedBox(height: 40),
-                _buildTitleText(),
-                const SizedBox(height: 40),
-                _buildCameraPreview(context, cameraService),
-                const SizedBox(height: 40),
-                _buildExtractedText(ocrProvider.extractedText),
-                const SizedBox(height: 500)
-              ],
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 100),
+                  _buildHeader(),
+                  const SizedBox(height: 40),
+                  _buildCameraPreview(context, cameraService),
+                  const SizedBox(height: 40),
+                  _buildExtractedText(ocrProvider.extractedText),
+                ],
+              ),
             ),
           ),
-          Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
             child: _buildActionButtons(context, cameraService, ocrService, ocrProvider),
           ),
         ],
@@ -68,24 +67,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeader() {
     return const Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        CustomDrawerButton(),
-      ],
-    );
-  }
-
-  Widget _buildTitleText() {
-    return const Center(
-      child: Text(
-        'Escaneie sua nota fiscal \n para começar a registrar!',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: "Space Grotesk",
-          fontSize: 28,
-          fontWeight: FontWeight.w700,
+        SizedBox(width: 20),
+        Expanded(
+          child: Text(
+            'Escaneie sua nota fiscal \n para começar a registrar!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Space Grotesk",
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
-      ),
+        CustomDrawerButton(),
+        SizedBox(width: 20),
+      ],
     );
   }
 
@@ -95,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return SizedBox(
-            height: 500,
+            height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width * 0.9,
             child: const CameraPreviewWidget(),
           );
@@ -119,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
             String text = await ocrService.extractTextFromImage(image.path);
             ocrProvider.updateExtractedText(text);
           } catch (e) {
-            print('Erro capturando a imagem: $e');
+            if (kDebugMode) {
+              print('Erro capturando a imagem: $e');
+            }
           }
         },
         onHistoryPressed: () {
@@ -147,8 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pop(context);
       },
       onHistoryTap: () {
-        // Navigator.of(context).pushReplacementNamed('/history');
-        Navigator.pop(context);
+        Navigator.of(context).pushReplacementNamed('/history');
       },
       onEditDataTap: () {
         // TODO: Edição de dados

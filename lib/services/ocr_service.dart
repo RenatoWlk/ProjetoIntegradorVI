@@ -1,8 +1,7 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart'; // OCR
 
 class OCRService {
-  // Função para realizar OCR com o Google ML Kit
   Future<String> extractTextFromImage(String imagePath) async {
     final inputImage = InputImage.fromFilePath(imagePath);
     final textRecognizer = TextRecognizer();
@@ -13,12 +12,12 @@ class OCRService {
 
       return extractedText;
     } catch (e) {
-        print("Erro ao realizar OCR: $e");
+        if (kDebugMode) {
+          print("Erro ao realizar OCR: $e");
+        }
         return "Erro ao realizar OCR";
     } finally {
-      // Fecha o textRecognizer para liberar recursos
       textRecognizer.close();
     }
   }
 }
-

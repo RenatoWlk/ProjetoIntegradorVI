@@ -61,10 +61,10 @@ packages:
     dependency: transitive
     description:
       name: camera_android_camerax
-      sha256: "7cd93578ad201dcc6bb5810451fb00d76a86bab9b68dceb68b8cbd7038ac5846"
+      sha256: e65d0d29a298926c63b0f009c5e045735a3ac183f5ae61a07ad826d8007a6018
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.8+3"
+    version: "0.6.9+1"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -729,10 +729,10 @@ packages:
     dependency: transitive
     description:
       name: xdg_directories
-      sha256: faea9dee56b520b55a566385b84f2e8de55e7496104adada9962e0bd11bcff1d
+      sha256: "7a3f37b05d989967cdddcbb571f1ea834867ae2faa29725fd085180e0883aa15"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
+    version: "1.1.0"
   xml:
     dependency: transitive
     description:
