@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:projeto_integrador_6/models/user.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class UpdatePasswordScreen extends StatelessWidget {
+  const UpdatePasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Controllers para registrar usuário:
-    final TextEditingController nomeController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController senhaController = TextEditingController();
-    final TextEditingController telefoneController = TextEditingController();
+    final TextEditingController confirmarSenhaController = TextEditingController();
 
     // Validar o formulário:
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -20,7 +19,7 @@ class RegisterScreen extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: SingleChildScrollView( // <-- Adicionando o SingleChildScrollView
+          child: SingleChildScrollView(
             child: Form(
               key: _formKey,
               child: Column(
@@ -30,7 +29,7 @@ class RegisterScreen extends StatelessWidget {
 
                   // TEXTO BEM VINDO
                   const Text(
-                    'Registre-se!',
+                    'Digite seus dados para alterar sua senha!',
                     style: TextStyle(
                       fontFamily: "Space Grotesk",
                       fontSize: 24,
@@ -40,31 +39,12 @@ class RegisterScreen extends StatelessWidget {
 
                   const SizedBox(height: 70),
 
-                  // INPUT NOME
-                  TextFormField(
-                    controller: nomeController,
-                    decoration: InputDecoration(
-                      icon: Icon(Icons.perm_identity_outlined),
-                      labelText: 'Nome',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, insira seu nome';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // INPUT EMAIL
+                  // INPUT E-MAIL
                   TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.email_outlined),
-                      labelText: 'Email',
+                      labelText: 'E-mail',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -81,13 +61,13 @@ class RegisterScreen extends StatelessWidget {
 
                   const SizedBox(height: 30),
 
-                  // INPUT SENHA
+                  // INPUT NOVA SENHA
                   TextFormField(
                     controller: senhaController,
                     obscureText: true,
                     decoration: InputDecoration(
                       icon: Icon(Icons.key_outlined),
-                      labelText: 'Senha',
+                      labelText: 'Nova senha',
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -103,6 +83,7 @@ class RegisterScreen extends StatelessWidget {
 
                   // INPUT CONFIRMAR SENHA
                   TextFormField(
+                    controller: confirmarSenhaController,
                     obscureText: true,
                     decoration: InputDecoration(
                       icon: Icon(Icons.key_outlined),
@@ -118,53 +99,27 @@ class RegisterScreen extends StatelessWidget {
                     },
                   ),
 
-                  const SizedBox(height: 30),
-
-                  // INPUT TELEFONE
-                  TextFormField(
-                    controller: telefoneController,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                      icon: Icon(Icons.phone_outlined),
-                      labelText: 'Telefone',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, digite seu telefone';
-                      }
-                      if (!RegExp(r'^\d{11}$').hasMatch(value)) {
-                        return 'O telefone deve conter 11 dígitos (DDD + número)';
-                      }
-                      return null;
-                    },
-                  ),
-
                   const SizedBox(height: 60),
 
-                  // BOTÃO CRIAR CONTA
+                  // BOTÃO ATUALIZAR SENHA
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-                        User newUser = User(
-                          name: nomeController.text,
-                          email: emailController.text,
-                          password: senhaController.text,
-                          telephone: telefoneController.text,
-                        );
-                        bool success = await MongoDatabase.register(newUser);
+                        String email = emailController.text.trim();
+                        String senha = senhaController.text.trim();
+
+                        bool success = await MongoDatabase.update(email, senha);
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Cadastro realizado com sucesso!'))
+                              SnackBar(content: Text('Senha atualizada com sucesso!'))
                           );
                           Future.delayed(Duration(seconds: 2), () {
-                          Navigator.of(context).pushReplacementNamed('/home');
+                          Navigator.of(context).pushReplacementNamed('/login');
                         });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erro: E-mail já cadastrado!')),
+                              SnackBar(content: Text('Erro: Nenhum usuário encontrado com esse e-mail!'))
                           );
                         }
                       }
@@ -177,7 +132,7 @@ class RegisterScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text(
-                        'Criar conta', style: TextStyle(color: Colors.white)),
+                        'Atualizar senha', style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

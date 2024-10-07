@@ -99,7 +99,9 @@ class LoginScreen extends StatelessWidget {
 
                   // BOTÃO ESQUECEU A SENHA
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/update_password');
+                    },
                     child: const Text('Esqueceu a senha?', style: TextStyle(color: Color.fromRGBO(153, 93, 0, 1))),
                   ),
                 ],
