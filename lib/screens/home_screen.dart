@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
@@ -10,6 +11,7 @@ import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
+import 'package:projeto_integrador_6/utils/invoice_util.dart';
 
 class HomeScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -115,6 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
           try {
             final image = await cameraService.captureImage();
             String text = await ocrService.extractTextFromImage(image.path);
+            // List<InvoiceItem> itens = InvoiceUtil.extractInvoiceItemsFromText(text);
+            // ocrProvider.updateExtractedText(InvoiceUtil.invoiceItemsToString(itens));
             ocrProvider.updateExtractedText(text);
           } catch (e) {
             if (kDebugMode) {

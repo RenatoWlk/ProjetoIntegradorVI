@@ -14,7 +14,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String list = '/list';
   static const String history = '/history';
-  static const String update_password = '/update_password';
+  static const String updatePassword = '/update_password';
 
   static Map<String, WidgetBuilder> define(CameraDescription camera) {
     return {
@@ -23,7 +23,7 @@ class AppRoutes {
       register: (context) => const RegisterScreen(),
       list: (context) => const ListScreen(),
       history: (context) => const HistoryScreen(),
-      update_password: (context) => const UpdatePasswordScreen()
+      updatePassword: (context) => const UpdatePasswordScreen()
     };
   }
 }

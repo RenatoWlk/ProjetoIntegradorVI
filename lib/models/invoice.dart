@@ -1,8 +1,10 @@
+import 'package:projeto_integrador_6/models/invoice_item.dart';
+
 class Invoice {
-  final int id;
   final int userId;
   final String orderDate;
-  final String invoiceData;
+  final double totalPrice;
+  List<InvoiceItem> invoiceItems;
 
-  Invoice({required this.id, required this.userId, required this.orderDate, required this.invoiceData});
+  Invoice({required this.userId, required this.orderDate, required this.totalPrice, this.invoiceItems = const []});
 }

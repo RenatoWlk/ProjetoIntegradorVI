@@ -14,15 +14,15 @@ class RegisterScreen extends StatelessWidget {
     final TextEditingController telefoneController = TextEditingController();
 
     // Validar o formulário:
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: SingleChildScrollView( // <-- Adicionando o SingleChildScrollView
+          child: SingleChildScrollView(
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -43,11 +43,12 @@ class RegisterScreen extends StatelessWidget {
                   // INPUT NOME
                   TextFormField(
                     controller: nomeController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.perm_identity_outlined),
                       labelText: 'Nome',
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                          borderRadius: BorderRadius.all(Radius.circular(10))
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -62,7 +63,7 @@ class RegisterScreen extends StatelessWidget {
                   // INPUT EMAIL
                   TextFormField(
                     controller: emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'Email',
                       border: OutlineInputBorder(
@@ -85,7 +86,7 @@ class RegisterScreen extends StatelessWidget {
                   TextFormField(
                     controller: senhaController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Senha',
                       border: OutlineInputBorder(
@@ -104,7 +105,7 @@ class RegisterScreen extends StatelessWidget {
                   // INPUT CONFIRMAR SENHA
                   TextFormField(
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Confirmar senha',
                       border: OutlineInputBorder(
@@ -124,7 +125,7 @@ class RegisterScreen extends StatelessWidget {
                   TextFormField(
                     controller: telefoneController,
                     obscureText: false,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.phone_outlined),
                       labelText: 'Telefone',
                       border: OutlineInputBorder(
@@ -146,7 +147,7 @@ class RegisterScreen extends StatelessWidget {
                   // BOTÃO CRIAR CONTA
                   ElevatedButton(
                     onPressed: () async {
-                      if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+                      if (formKey.currentState != null && formKey.currentState!.validate()) {
                         User newUser = User(
                           name: nomeController.text,
                           email: emailController.text,
@@ -157,14 +158,14 @@ class RegisterScreen extends StatelessWidget {
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Cadastro realizado com sucesso!'))
+                            const SnackBar(content: Text('Cadastro realizado com sucesso!'))
                           );
-                          Future.delayed(Duration(seconds: 2), () {
-                          Navigator.of(context).pushReplacementNamed('/home');
-                        });
+                          Future.delayed(const Duration(seconds: 2), () {
+                            Navigator.of(context).pushReplacementNamed('/home');
+                          });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Erro: E-mail já cadastrado!')),
+                            const SnackBar(content: Text('Erro: E-mail já cadastrado!')),
                           );
                         }
                       }
@@ -177,7 +178,8 @@ class RegisterScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text(
-                        'Criar conta', style: TextStyle(color: Colors.white)),
+                        'Criar conta', style: TextStyle(color: Colors.white)
+                    ),
                   ),
                 ],
               ),

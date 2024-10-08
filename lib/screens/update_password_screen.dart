@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
-import 'package:projeto_integrador_6/models/user.dart';
 
 class UpdatePasswordScreen extends StatelessWidget {
   const UpdatePasswordScreen({super.key});
@@ -13,7 +12,7 @@ class UpdatePasswordScreen extends StatelessWidget {
     final TextEditingController confirmarSenhaController = TextEditingController();
 
     // Validar o formulário:
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Scaffold(
       body: SafeArea(
@@ -21,7 +20,7 @@ class UpdatePasswordScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: SingleChildScrollView(
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -42,7 +41,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                   // INPUT E-MAIL
                   TextFormField(
                     controller: emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'E-mail',
                       border: OutlineInputBorder(
@@ -65,7 +64,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                   TextFormField(
                     controller: senhaController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Nova senha',
                       border: OutlineInputBorder(
@@ -85,7 +84,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                   TextFormField(
                     controller: confirmarSenhaController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Confirmar senha',
                       border: OutlineInputBorder(
@@ -104,7 +103,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                   // BOTÃO ATUALIZAR SENHA
                   ElevatedButton(
                     onPressed: () async {
-                      if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+                      if (formKey.currentState != null && formKey.currentState!.validate()) {
                         String email = emailController.text.trim();
                         String senha = senhaController.text.trim();
 
@@ -112,14 +111,14 @@ class UpdatePasswordScreen extends StatelessWidget {
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Senha atualizada com sucesso!'))
+                              const SnackBar(content: Text('Senha atualizada com sucesso!'))
                           );
                           Future.delayed(Duration(seconds: 2), () {
                           Navigator.of(context).pushReplacementNamed('/login');
                         });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Erro: Nenhum usuário encontrado com esse e-mail!'))
+                              const SnackBar(content: Text('Erro: Nenhum usuário encontrado com esse e-mail!'))
                           );
                         }
                       }
