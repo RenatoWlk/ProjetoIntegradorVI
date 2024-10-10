@@ -65,7 +65,7 @@ class InvoiceUtil {
     final match = regex.firstMatch(text);
     if (match != null) {
       String name = match.group(0)!.trim();
-      final unwantedWords = ['RS', 'R\$', 'UN', 'UNI', 'UNID', 'KG', 'G', 'ML', 'L', 'iuni', 'iun', 'i un', 'i uni', 'total', 'subtotal'];
+      final unwantedWords = ['RS', 'R\$', 'UN', 'UNI', 'UNID', 'KG', 'G', 'ML', 'L', 'iuni', 'iun', 'i un', 'i uni', 'total', 'subtotal', 'descontos', 'acrescimos'];
       for (var word in unwantedWords) {
         name = name.replaceAll(RegExp(r'\b' + word + r'\b', caseSensitive: false), '');
       }
@@ -94,7 +94,7 @@ class InvoiceUtil {
   }
 
   String improveOCRFormatting(String ocrText) {
-    return 'cu';
+    return 'teste';
   }
 
   String invoiceItemsToString(List<InvoiceItem> itens) {

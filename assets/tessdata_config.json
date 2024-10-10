@@ -1,8 +1,0 @@
-{
-  "files": [
-    "por.traineddata",
-    "eng.traineddata"
-  ],
-  "tessdata_root": "/assets/tessdata",
-  "language_models": ["por","eng"]
-}

@@ -115,11 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         onScanPressed: () async {
           try {
+            final InvoiceUtil invoiceUtil = InvoiceUtil();
             final image = await cameraService.captureImage();
             String text = await ocrService.extractTextFromImage(image.path);
-            // List<InvoiceItem> itens = InvoiceUtil.extractInvoiceItemsFromText(text);
-            // ocrProvider.updateExtractedText(InvoiceUtil.invoiceItemsToString(itens));
-            ocrProvider.updateExtractedText(text);
+            List<InvoiceItem> itens = invoiceUtil.extractInvoiceItemsFromText(text);
+            ocrProvider.updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
+            // ocrProvider.updateExtractedText(text);
           } catch (e) {
             if (kDebugMode) {
               print('Erro capturando a imagem: $e');

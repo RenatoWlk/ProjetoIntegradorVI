@@ -15,7 +15,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_tesseract_ocr: ^0.4.26
   provider: ^6.1.2
   camera: ^0.11.0+2
   path_provider: ^2.1.4
@@ -33,14 +32,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-
-
   assets:
     - assets/images/
     # - assets/icons/
-    - assets/tessdata_config.json
-    - assets/tessdata/eng.traineddata
-    - assets/tessdata/por.traineddata
 
   # To add assets to your application, add an assets section, like this:
   # assets:
