@@ -2,8 +2,11 @@ import 'dart:developer';
 import 'package:projeto_integrador_6/models/user.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:projeto_integrador_6/services/database/constants.dart';
+import 'package:projeto_integrador_6/services/encryption.dart';
 
 class MongoDatabase {
+
+  static final Encryption encryption = Encryption();
 
   static Future<void> connect() async {
     try {
@@ -31,9 +34,11 @@ class MongoDatabase {
         return false;
       }
 
+      String hashedPassword = await encryption.hashPassword(user.password);
+
       await collection.insertOne({
         "nome": user.name,
-        "senha": user.password,
+        "senha": hashedPassword,
         "email": user.email,
         "telefone":user.telephone,
       });
@@ -47,7 +52,39 @@ class MongoDatabase {
       await db.close();
     }
   }
-  
+
+  static Future<bool> login(String email, String password) async {
+    Db db = await Db.create(DB_URL);
+    try {
+      await db.open();
+      var collection = db.collection(COLLECTION_NAME);
+
+      var user = await collection.findOne(where.eq('email', email));
+
+      if (user == null) {
+        print('Usuário não registrado! Faça cadastro!');
+        return false;
+      }
+
+      String hashedPassword = user['senha'];
+      bool passwordMatches = await encryption.checkPassword(password, hashedPassword);
+
+      if (passwordMatches) {
+        print('Login realizado com sucesso!');
+        return true;
+      } else {
+        print('Erro: Senha incorreta!');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao tentar realizar login: $e');
+      return false;
+    } finally {
+      await db.close();
+      print("Conexão fechada");
+    }
+  }
+
   static Future<bool> update(String email, String newPassword) async {
     Db db = await Db.create(DB_URL);
     try {
@@ -65,9 +102,11 @@ class MongoDatabase {
 
       print('Usuário encontrado $user');
 
+      String hashedPassword = encryption.hashPassword(newPassword) as String;
+
       var result = await collection.updateOne(
         where.eq('email', email),
-        modify.set('senha', newPassword)
+        modify.set('senha', hashedPassword)
       );
 
       print('Resultado da atualização: ${result.nModified} documentos modificados');

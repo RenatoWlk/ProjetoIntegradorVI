@@ -38,7 +38,7 @@ class App extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        title: 'TEM QUE QUERÊ',
+        title: 'ANDRÉ MENDELECK LTDA.',
         theme: ThemeData(
           primarySwatch: Colors.grey,
         ),
