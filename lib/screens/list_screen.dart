@@ -231,6 +231,8 @@ class ListScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        _buildDeleteAllItemsButton(context, formDialogs),
+        const SizedBox(width: 20),
         _buildAddItemButton(context, formDialogs),
         const SizedBox(width: 20),
         _buildSaveListButton(context),
@@ -238,10 +240,21 @@ class ListScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDeleteAllItemsButton(
+      BuildContext context, FormDialogs formDialogs) {
+    return FloatingActionButton(
+      onPressed: () => formDialogs.showRemoveAllItemsDialog(context),
+      backgroundColor: Colors.red,
+      heroTag: 'remove_all_fab',
+      child: const Icon(Icons.delete_forever_outlined),
+    );
+  }
+
   Widget _buildAddItemButton(BuildContext context, FormDialogs formDialogs) {
     return FloatingActionButton(
       onPressed: () => formDialogs.showAddItemDialog(context),
       backgroundColor: Colors.orange,
+      heroTag: 'add_item_fab',
       child: const Icon(Icons.add),
     );
   }
@@ -260,6 +273,7 @@ class ListScreen extends StatelessWidget {
         );
       },
       backgroundColor: Colors.blue,
+      heroTag: 'save_fab',
       child: const Icon(Icons.save),
     );
   }

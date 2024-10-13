@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-// import 'package:projeto_integrador_6/screens/home_screen.dart';
-import 'package:projeto_integrador_6/screens/login_screen.dart';
+import 'package:projeto_integrador_6/screens/home_screen.dart';
+// import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
@@ -47,8 +47,8 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.grey,
         ),
-        home: const LoginScreen(),
-        // home: HomeScreen(camera: camera),
+        // home: const LoginScreen(),
+        home: HomeScreen(camera: camera),
         routes: AppRoutes.define(camera),
         debugShowCheckedModeBanner: false,
       ),

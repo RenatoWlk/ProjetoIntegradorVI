@@ -36,8 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    cameraService.disableFlash();
-    cameraService.dispose();
+    if (mounted) {
+      cameraService.disableFlash();
+      cameraService.dispose();
+    }
     super.dispose();
   }
 
@@ -129,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         onScanPressed: () async {
           try {
+            if (!context.mounted) return;
             final InvoiceUtil invoiceUtil = InvoiceUtil();
             final image = await cameraService.captureImage();
             String text = await ocrService.extractTextFromImage(image.path);
@@ -136,11 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
             if (!context.mounted) return;
 
             if (isInvoice) {
-              List<InvoiceItem> itens =
+              List<InvoiceItem> items =
                   invoiceUtil.extractInvoiceItemsFromText(text);
-              invoiceItemsProvider.addInvoiceItems(itens);
+              invoiceItemsProvider.addInvoiceItems(items);
               ocrProvider
-                  .updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
+                  .updateExtractedText(invoiceUtil.invoiceItemsToString(items));
 
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Escaneado com sucesso!')));

@@ -14,14 +14,19 @@ class InvoiceUtil {
     String formattedText = improveOCRFormatting(ocrText);
     List<String> lines = formattedText.split('\n');
 
-    for (int i = 0; i < lines.length; i++) {
+    int i = 0;
+    while (i < lines.length) {
       String line = lines[i];
       double? price = extractItemPrice(line);
+      String? name = extractItemName(line);
 
-      if (price == null) continue;
+      if (price == null && name == null) {
+        lines.removeAt(i);
+        continue;
+      }
 
-      String? name;
       int? quantity;
+      int? selectedLineIndex;
 
       for (int j = i - 1; j >= i - 3 && j >= 0; j--) {
         String? extractedName = extractItemName(lines[j]);
@@ -30,9 +35,8 @@ class InvoiceUtil {
         if (extractedName != null &&
             !namesAlreadyUsed.contains(extractedName)) {
           name = extractedName;
-          namesAlreadyUsed.add(name);
+          selectedLineIndex = j;
           quantity = extractedQuantity ?? quantity;
-          break;
         }
       }
 
@@ -46,15 +50,23 @@ class InvoiceUtil {
             name = extractedName;
             namesAlreadyUsed.add(name);
             quantity = extractedQuantity ?? quantity;
+            lines.removeAt(j);
             break;
           }
         }
       }
 
       quantity ??= 1;
-      if (name != null) {
+      if (name != null && price != null) {
         items.add(InvoiceItem(
             itemName: name, itemQuantity: quantity, itemPrice: price));
+        if (selectedLineIndex != null) {
+          lines.removeAt(selectedLineIndex);
+          if (selectedLineIndex < i) i--;
+        }
+        lines.removeAt(i);
+      } else {
+        i++;
       }
     }
 
@@ -96,6 +108,7 @@ class InvoiceUtil {
       'acrescimos',
       'VL',
       'descricao',
+      'descrica0',
       'qtde',
       'qtd',
       'cupom',

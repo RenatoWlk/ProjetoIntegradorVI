@@ -117,4 +117,33 @@ class FormDialogs {
       },
     );
   }
+
+  void showRemoveAllItemsDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Deseja remover todos os itens da lista?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancelar')),
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                ),
+                onPressed: () {
+                  Provider.of<InvoiceItemsProvider>(context, listen: false)
+                      .clearItems();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Remover'),
+              )
+            ],
+          );
+        });
+  }
 }

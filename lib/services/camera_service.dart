@@ -13,8 +13,10 @@ class CameraService with ChangeNotifier {
 
   @override
   void dispose() {
+    if (_controller.value.isInitialized) {
+      _controller.dispose();
+    }
     super.dispose();
-    _controller.dispose();
   }
 
   Future<XFile> captureImage() async {
@@ -22,9 +24,11 @@ class CameraService with ChangeNotifier {
   }
 
   Future<void> disableFlash() async {
-    if (_controller.value.flashMode != FlashMode.off) {
-      await _controller.setFlashMode(FlashMode.off);
-      notifyListeners();
+    if (_controller.value.isInitialized && !_controller.value.isTakingPicture) {
+      if (_controller.value.flashMode != FlashMode.off) {
+        await _controller.setFlashMode(FlashMode.off);
+        notifyListeners();
+      }
     }
   }
 
