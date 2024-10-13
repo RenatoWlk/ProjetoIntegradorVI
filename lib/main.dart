@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+// import 'package:projeto_integrador_6/screens/home_screen.dart';
 import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ import 'routes/app_routes.dart';
 import 'services/camera_service.dart';
 import 'services/ocr_service.dart';
 import 'providers/ocr_provider.dart';
-import 'providers/invoice_provider.dart';
+import 'providers/invoice_items_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,8 +38,8 @@ class App extends StatelessWidget {
         ChangeNotifierProvider<CameraService>(
           create: (_) => CameraService(),
         ),
-        ChangeNotifierProvider<InvoiceProvider>(
-          create: (context) => InvoiceProvider(),
+        ChangeNotifierProvider<InvoiceItemsProvider>(
+          create: (context) => InvoiceItemsProvider(),
         ),
       ],
       child: MaterialApp(

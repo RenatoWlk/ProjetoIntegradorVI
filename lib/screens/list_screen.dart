@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
-import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
+import 'package:projeto_integrador_6/utils/form_dialogs.dart';
 import 'package:provider/provider.dart';
 
 class ListScreen extends StatelessWidget {
@@ -11,7 +11,8 @@ class ListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final invoiceProvider = Provider.of<InvoiceProvider>(context);
+    final invoiceItemsProvider = Provider.of<InvoiceItemsProvider>(context);
+    final formDialogs = FormDialogs();
 
     return Scaffold(
       endDrawer: _buildDrawer(context),
@@ -26,14 +27,20 @@ class ListScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildProductList(context, invoiceProvider),
+                  _buildProductList(context, invoiceItemsProvider, formDialogs),
                 ],
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
-            child: _buildActionButtons(context),
+            child: Column(
+              children: [
+                _buildListActionButtons(context, formDialogs),
+                const SizedBox(height: 20),
+                _buildActionButtons(context),
+              ],
+            ),
           ),
         ],
       ),
@@ -46,14 +53,26 @@ class ListScreen extends StatelessWidget {
       children: <Widget>[
         SizedBox(width: 20),
         Expanded(
-          child: Text(
-            'Sua Lista',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "Space Grotesk",
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-            ),
+          child: Column(
+            children: [
+              Text(
+                'Sua Lista',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Space Grotesk",
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                'Toque para editar',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: "Space Grotesk",
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic),
+              )
+            ],
           ),
         ),
         CustomDrawerButton(),
@@ -62,9 +81,9 @@ class ListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductList(
-      BuildContext context, InvoiceProvider invoiceProvider) {
-    final products = invoiceProvider.invoiceItems;
+  Widget _buildProductList(BuildContext context,
+      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
+    final products = invoiceItemsProvider.invoiceItems;
 
     return ListView.builder(
       shrinkWrap: true,
@@ -73,14 +92,25 @@ class ListScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final product = products[index];
         return _buildProductItem(
+            context,
             product.itemName,
             product.itemQuantity.toString(),
-            product.itemPrice.toStringAsFixed(2));
+            product.itemPrice.toStringAsFixed(2),
+            index,
+            invoiceItemsProvider,
+            formDialogs);
       },
     );
   }
 
-  Widget _buildProductItem(String name, String quantity, String price) {
+  Widget _buildProductItem(
+      BuildContext context,
+      String name,
+      String quantity,
+      String price,
+      int index,
+      InvoiceItemsProvider invoiceItemsProvider,
+      FormDialogs formDialogs) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
@@ -92,35 +122,65 @@ class ListScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Edit name
             Expanded(
-              child: Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              child: InkWell(
+                onTap: () {
+                  formDialogs.editItemField(context, 'Editar Nome', name,
+                      (newValue) {
+                    invoiceItemsProvider.updateInvoiceItemName(index, newValue);
+                  });
+                },
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
             Row(
               children: [
-                Text(
-                  quantity.isNotEmpty ? quantity : '',
-                  style: const TextStyle(
-                    fontSize: 18,
+                // Edit quantity
+                InkWell(
+                  onTap: () {
+                    formDialogs.editItemField(
+                        context, 'Editar Quantidade', quantity, (newValue) {
+                      invoiceItemsProvider.updateInvoiceItemQuantity(
+                          index, int.parse(newValue));
+                    });
+                  },
+                  child: Text(
+                    quantity.isNotEmpty ? quantity : '',
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  price.isNotEmpty ? price : '',
-                  style: const TextStyle(
-                    fontSize: 18,
+                // Edit price
+                InkWell(
+                  onTap: () {
+                    formDialogs.editItemField(context, 'Editar Preço', price,
+                        (newValue) {
+                      invoiceItemsProvider.updateInvoiceItemPrice(
+                          index, double.parse(newValue));
+                    });
+                  },
+                  child: Text(
+                    price.isNotEmpty ? price : '',
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
+                // Remove item button
                 IconButton(
                   icon: const Icon(Icons.cancel_outlined),
                   onPressed: () {
-                    // TODO: Remover item da lista
+                    invoiceItemsProvider.removeInvoiceItem(index);
                   },
                 ),
               ],
@@ -140,6 +200,7 @@ class ListScreen extends StatelessWidget {
       onHistoryPressed: () {
         Navigator.of(context).pushReplacementNamed('/history');
       },
+      listButtonColor: Colors.orange,
     );
   }
 
@@ -162,6 +223,44 @@ class ListScreen extends StatelessWidget {
         // TODO: Logout
         Navigator.pop(context);
       },
+    );
+  }
+
+  Widget _buildListActionButtons(
+      BuildContext context, FormDialogs formDialogs) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildAddItemButton(context, formDialogs),
+        const SizedBox(width: 20),
+        _buildSaveListButton(context),
+      ],
+    );
+  }
+
+  Widget _buildAddItemButton(BuildContext context, FormDialogs formDialogs) {
+    return FloatingActionButton(
+      onPressed: () => formDialogs.showAddItemDialog(context),
+      backgroundColor: Colors.orange,
+      child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _buildSaveListButton(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        // TODO: salvar lista
+        // - criar um objeto invoice com os invoiceitems;
+        // - criar invoice_provider;
+        // - criar novo invoice e notificar os listeners (tela histórico);
+        // - redirecionar para histórico;
+        // - vai corinthians;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lista salva com sucesso!')),
+        );
+      },
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.save),
     );
   }
 }

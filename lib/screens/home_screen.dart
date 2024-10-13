@@ -5,7 +5,7 @@ import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
-import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/services/camera_service.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
@@ -25,17 +25,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<void> _initializeCameraFuture;
+  late CameraService cameraService;
 
   @override
   void initState() {
     super.initState();
-    final cameraService = Provider.of<CameraService>(context, listen: false);
+    cameraService = Provider.of<CameraService>(context, listen: false);
     _initializeCameraFuture = cameraService.initialize(widget.camera);
   }
 
   @override
   void dispose() {
-    final cameraService = Provider.of<CameraService>(context, listen: false);
     cameraService.disableFlash();
     cameraService.dispose();
     super.dispose();
@@ -43,10 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cameraService = Provider.of<CameraService>(context);
     final ocrService = Provider.of<OCRService>(context);
     final ocrProvider = Provider.of<OCRProvider>(context);
-    final invoiceProvider = Provider.of<InvoiceProvider>(context);
+    final invoiceItemsProvider = Provider.of<InvoiceItemsProvider>(context);
 
     return Scaffold(
       endDrawer: _buildDrawer(context),
@@ -62,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildHeader(),
                   const SizedBox(height: 40),
                   _buildCameraPreview(context, cameraService),
-                  const SizedBox(height: 40),
-                  _buildExtractedText(ocrProvider.extractedText),
                 ],
               ),
             ),
@@ -71,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
             child: _buildActionButtons(context, cameraService, ocrService,
-                ocrProvider, invoiceProvider),
+                ocrProvider, invoiceItemsProvider),
           ),
         ],
       ),
@@ -125,64 +122,54 @@ class _HomeScreenState extends State<HomeScreen> {
       CameraService cameraService,
       OCRService ocrService,
       OCRProvider ocrProvider,
-      InvoiceProvider invoiceProvider) {
+      InvoiceItemsProvider invoiceItemsProvider) {
     return ActionButtons(
-      onListPressed: () {
-        Navigator.of(context).pushReplacementNamed('/list');
-      },
-      onScanPressed: () async {
-        try {
-          final InvoiceUtil invoiceUtil = InvoiceUtil();
-          final image = await cameraService.captureImage();
-          String text = await ocrService.extractTextFromImage(image.path);
-          bool isInvoice = InvoiceUtil.isInvoice(text);
-          if (!context.mounted) return;
+        onListPressed: () {
+          Navigator.of(context).pushReplacementNamed('/list');
+        },
+        onScanPressed: () async {
+          try {
+            final InvoiceUtil invoiceUtil = InvoiceUtil();
+            final image = await cameraService.captureImage();
+            String text = await ocrService.extractTextFromImage(image.path);
+            bool isInvoice = InvoiceUtil.isInvoice(text);
+            if (!context.mounted) return;
 
-          if (isInvoice) {
-            List<InvoiceItem> itens =
-                invoiceUtil.extractInvoiceItemsFromText(text);
-            invoiceProvider.addInvoiceItems(itens);
-            ocrProvider
-                .updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
+            if (isInvoice) {
+              List<InvoiceItem> itens =
+                  invoiceUtil.extractInvoiceItemsFromText(text);
+              invoiceItemsProvider.addInvoiceItems(itens);
+              ocrProvider
+                  .updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
 
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Escaneado com sucesso!')));
+              Future.delayed(const Duration(seconds: 2), () {
+                if (context.mounted) {
+                  cameraService.disableFlash();
+                  Navigator.of(context).pushReplacementNamed('/list');
+                }
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text(
+                        'Não foi possível identificar uma nota fiscal :(')),
+              );
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Erro escaneando a imagem: $e');
+            }
             ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Escaneado com sucesso!')));
-            Future.delayed(const Duration(seconds: 2), () {
-              if (context.mounted) {
-                cameraService.disableFlash();
-                Navigator.of(context).pushReplacementNamed('/list');
-              }
-            });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content:
-                      Text('Não foi possível identificar uma nota fiscal :(')),
+              const SnackBar(content: Text('Erro ao escanear a imagem.')),
             );
           }
-        } catch (e) {
-          if (kDebugMode) {
-            print('Erro escaneando a imagem: $e');
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erro ao escanear a imagem.')),
-          );
-        }
-      },
-      onHistoryPressed: () {
-        Navigator.of(context).pushReplacementNamed('/history');
-      },
-    );
-  }
-
-  Widget _buildExtractedText(String text) {
-    return Text(
-      'Texto detectado: $text',
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+        },
+        onHistoryPressed: () {
+          Navigator.of(context).pushReplacementNamed('/history');
+        },
+        scanButtonColor: Colors.orange);
   }
 
   Widget _buildDrawer(BuildContext context) {

@@ -118,6 +118,7 @@ class HistoryScreen extends StatelessWidget {
         Navigator.of(context).pushReplacementNamed('/home');
       },
       onHistoryPressed: () {},
+      historyButtonColor: Colors.orange,
     );
   }
 

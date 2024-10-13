@@ -11,11 +11,8 @@ class InvoiceUtil {
   List<InvoiceItem> extractInvoiceItemsFromText(String ocrText) {
     List<InvoiceItem> items = [];
     List<String> namesAlreadyUsed = [];
-    // String formattedText = improveOCRFormatting(ocrText);
-    List<String> lines = ocrText.split('\n');
-
-    // Passa por todas as linhas, quando acha um preço tenta achar
-    // nas linhas anteriores e posteriores um nome e quantidade;
+    String formattedText = improveOCRFormatting(ocrText);
+    List<String> lines = formattedText.split('\n');
 
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
@@ -79,15 +76,13 @@ class InvoiceUtil {
       'UNI',
       'UNID',
       'UNIT',
-      'KG',
-      'G',
-      'ML',
-      'VL',
       'L',
       'X',
       'F',
       'T',
       'I',
+      'K',
+      'T10',
       'iuni',
       'iun',
       'i un',
@@ -102,6 +97,7 @@ class InvoiceUtil {
       'VL',
       'descricao',
       'qtde',
+      'qtd',
       'cupom',
       'cupon',
       'fiscal',
@@ -117,8 +113,9 @@ class InvoiceUtil {
     ];
 
     for (var word in unwantedWords) {
-      name = name.replaceAll(
-          RegExp(r'\b' + word + r'\b', caseSensitive: false), '');
+      if (RegExp(r'\b' + word + r'\b', caseSensitive: false).hasMatch(name)) {
+        return null;
+      }
     }
 
     name = name.replaceAll(RegExp(r'\s+'), ' ').trim();
@@ -166,11 +163,10 @@ class InvoiceUtil {
 
     // vê se tem mais de 1 match com a palavra total
     if (totalMatches.length > 1) {
-      // corta tudo antes do primeiro total
       final Match firstTotalMatch = totalMatches.first;
       final Match lastTotalMatch = totalMatches.last;
 
-      // corta a partir do final do primeiro total
+      // corta tudo antes do primeiro total
       String ocrTextAfterFirstTotal = ocrText.substring(firstTotalMatch.end);
 
       // corta tudo depois do último total

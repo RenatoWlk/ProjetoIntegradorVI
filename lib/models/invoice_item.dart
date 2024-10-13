@@ -1,7 +1,7 @@
 class InvoiceItem {
-  final String itemName;
-  final double itemPrice;
-  final int itemQuantity;
+  String itemName;
+  double itemPrice;
+  int itemQuantity;
 
   InvoiceItem(
       {required this.itemName,
