@@ -72,7 +72,8 @@ class HistoryScreen extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        return _buildHistoryItem(item['title'] as String, item['date'] as String);
+        return _buildHistoryItem(
+            item['title'] as String, item['date'] as String);
       },
     );
   }
@@ -116,9 +117,7 @@ class HistoryScreen extends StatelessWidget {
       onScanPressed: () {
         Navigator.of(context).pushReplacementNamed('/home');
       },
-      onHistoryPressed: () {
-
-      },
+      onHistoryPressed: () {},
     );
   }
 

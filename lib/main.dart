@@ -8,6 +8,7 @@ import 'routes/app_routes.dart';
 import 'services/camera_service.dart';
 import 'services/ocr_service.dart';
 import 'providers/ocr_provider.dart';
+import 'providers/invoice_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +36,10 @@ class App extends StatelessWidget {
         ),
         ChangeNotifierProvider<CameraService>(
           create: (_) => CameraService(),
-        )
+        ),
+        ChangeNotifierProvider<InvoiceProvider>(
+          create: (context) => InvoiceProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'ANDRÉ MENDELECK LTDA.',
@@ -43,6 +47,7 @@ class App extends StatelessWidget {
           primarySwatch: Colors.grey,
         ),
         home: const LoginScreen(),
+        // home: HomeScreen(camera: camera),
         routes: AppRoutes.define(camera),
         debugShowCheckedModeBanner: false,
       ),

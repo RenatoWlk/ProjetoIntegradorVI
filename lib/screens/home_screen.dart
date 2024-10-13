@@ -5,6 +5,7 @@ import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/services/camera_service.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
@@ -33,10 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    final cameraService = Provider.of<CameraService>(context, listen: false);
+    cameraService.disableFlash();
+    cameraService.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cameraService = Provider.of<CameraService>(context);
     final ocrService = Provider.of<OCRService>(context);
     final ocrProvider = Provider.of<OCRProvider>(context);
+    final invoiceProvider = Provider.of<InvoiceProvider>(context);
 
     return Scaffold(
       endDrawer: _buildDrawer(context),
@@ -60,7 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
-            child: _buildActionButtons(context, cameraService, ocrService, ocrProvider),
+            child: _buildActionButtons(context, cameraService, ocrService,
+                ocrProvider, invoiceProvider),
           ),
         ],
       ),
@@ -89,7 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCameraPreview(BuildContext context, CameraService cameraService) {
+  Widget _buildCameraPreview(
+      BuildContext context, CameraService cameraService) {
     return FutureBuilder<void>(
       future: _initializeCameraFuture,
       builder: (context, snapshot) {
@@ -108,28 +120,58 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, CameraService cameraService, OCRService ocrService, OCRProvider ocrProvider) {
+  Widget _buildActionButtons(
+      BuildContext context,
+      CameraService cameraService,
+      OCRService ocrService,
+      OCRProvider ocrProvider,
+      InvoiceProvider invoiceProvider) {
     return ActionButtons(
-        onListPressed: () {
-          Navigator.of(context).pushReplacementNamed('/list');
-        },
-        onScanPressed: () async {
-          try {
-            final InvoiceUtil invoiceUtil = InvoiceUtil();
-            final image = await cameraService.captureImage();
-            String text = await ocrService.extractTextFromImage(image.path);
-            List<InvoiceItem> itens = invoiceUtil.extractInvoiceItemsFromText(text);
-            ocrProvider.updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
-            // ocrProvider.updateExtractedText(text);
-          } catch (e) {
-            if (kDebugMode) {
-              print('Erro capturando a imagem: $e');
-            }
+      onListPressed: () {
+        Navigator.of(context).pushReplacementNamed('/list');
+      },
+      onScanPressed: () async {
+        try {
+          final InvoiceUtil invoiceUtil = InvoiceUtil();
+          final image = await cameraService.captureImage();
+          String text = await ocrService.extractTextFromImage(image.path);
+          bool isInvoice = InvoiceUtil.isInvoice(text);
+          if (!context.mounted) return;
+
+          if (isInvoice) {
+            List<InvoiceItem> itens =
+                invoiceUtil.extractInvoiceItemsFromText(text);
+            invoiceProvider.addInvoiceItems(itens);
+            ocrProvider
+                .updateExtractedText(invoiceUtil.invoiceItemsToString(itens));
+
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Escaneado com sucesso!')));
+            Future.delayed(const Duration(seconds: 2), () {
+              if (context.mounted) {
+                cameraService.disableFlash();
+                Navigator.of(context).pushReplacementNamed('/list');
+              }
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content:
+                      Text('Não foi possível identificar uma nota fiscal :(')),
+            );
           }
-        },
-        onHistoryPressed: () {
-          Navigator.of(context).pushReplacementNamed('/history');
-        },
+        } catch (e) {
+          if (kDebugMode) {
+            print('Erro escaneando a imagem: $e');
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao escanear a imagem.')),
+          );
+        }
+      },
+      onHistoryPressed: () {
+        Navigator.of(context).pushReplacementNamed('/history');
+      },
     );
   }
 

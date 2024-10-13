@@ -22,25 +22,24 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 60),
 
-                  const Row(
-                      children: [
-                        // ICONE CARRINHO
-                        Icon(
-                          Icons.shopping_cart_outlined,
-                          size: 110,
-                          color: Colors.black,
-                        ),
+                  const Row(children: [
+                    // ICONE CARRINHO
+                    Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 110,
+                      color: Colors.black,
+                    ),
 
-                        // TEXTO NOME DO APP
-                        Text('ANDRÉ MENDELECK LTDA.',
-                          style: TextStyle(
-                            fontFamily: "Space Grotesk",
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      ]
-                  ),
+                    // TEXTO NOME DO APP
+                    Text(
+                      'ANDRÉ MENDELECK LTDA.',
+                      style: TextStyle(
+                        fontFamily: "Space Grotesk",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )
+                  ]),
 
                   const SizedBox(height: 20),
 
@@ -70,10 +69,11 @@ class LoginScreen extends StatelessWidget {
                   // INPUT EMAIL
                   TextFormField(
                     controller: emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'Email',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -89,10 +89,11 @@ class LoginScreen extends StatelessWidget {
                   TextFormField(
                     controller: passwordController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Senha',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -121,9 +122,12 @@ class LoginScreen extends StatelessWidget {
                       // BOTÃO ESQUECEU A SENHA
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/update_password');
+                          Navigator.of(context)
+                              .pushReplacementNamed('/update_password');
                         },
-                        child: const Text('Esqueceu a senha?', style: TextStyle(color: Color.fromRGBO(153, 93, 0, 1))),
+                        child: const Text('Esqueceu a senha?',
+                            style: TextStyle(
+                                color: Color.fromRGBO(153, 93, 0, 1))),
                       ),
                     ],
                   ),
@@ -133,22 +137,31 @@ class LoginScreen extends StatelessWidget {
                   // BOTÃO ENTRAR NA CONTA
                   ElevatedButton(
                     onPressed: () async {
-                      if (formKey.currentState != null && formKey.currentState!.validate()) {
+                      if (formKey.currentState != null &&
+                          formKey.currentState!.validate()) {
                         String email = emailController.text.trim();
                         String password = passwordController.text.trim();
 
-                        bool success = await MongoDatabase.login(email, password);
+                        bool success =
+                            await MongoDatabase.login(email, password);
+                        if (!context.mounted) return;
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Login realizado com sucesso!'))
-                          );
+                              const SnackBar(
+                                  content:
+                                      Text('Login realizado com sucesso!')));
                           Future.delayed(const Duration(seconds: 2), () {
-                            Navigator.of(context).pushReplacementNamed('/home');
+                            if (context.mounted) {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/home');
+                            }
                           });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Erro: E-mail ou senha incorretos!')),
+                            const SnackBar(
+                                content:
+                                    Text('Erro: E-mail ou senha incorretos!')),
                           );
                         }
                       }
@@ -160,7 +173,8 @@ class LoginScreen extends StatelessWidget {
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text('Entrar na conta', style: TextStyle(color: Colors.white)),
+                    child: const Text('Entrar na conta',
+                        style: TextStyle(color: Colors.white)),
                   ),
 
                   const SizedBox(height: 30),
@@ -177,7 +191,8 @@ class LoginScreen extends StatelessWidget {
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text('Criar conta', style: TextStyle(color: Colors.black)),
+                    child: const Text('Criar conta',
+                        style: TextStyle(color: Colors.black)),
                   ),
                 ],
               ),

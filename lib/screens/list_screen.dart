@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:provider/provider.dart';
 
 class ListScreen extends StatelessWidget {
   const ListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final invoiceProvider = Provider.of<InvoiceProvider>(context);
+
     return Scaffold(
       endDrawer: _buildDrawer(context),
       body: Column(
@@ -22,7 +26,7 @@ class ListScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildProductList(),
+                  _buildProductList(context, invoiceProvider),
                 ],
               ),
             ),
@@ -58,13 +62,9 @@ class ListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProductList() {
-    final products = [
-      {'name': 'Produto 1', 'price': '24,99'},
-      {'name': 'Produto 2', 'price': '12,99'},
-      {'name': 'Produto 3', 'price': '6,50'},
-      {'name': 'Produto 4', 'price': '16,99'},
-    ];
+  Widget _buildProductList(
+      BuildContext context, InvoiceProvider invoiceProvider) {
+    final products = invoiceProvider.invoiceItems;
 
     return ListView.builder(
       shrinkWrap: true,
@@ -72,12 +72,15 @@ class ListScreen extends StatelessWidget {
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
-        return _buildProductItem(product['name'] as String, product['price'] as String);
+        return _buildProductItem(
+            product.itemName,
+            product.itemQuantity.toString(),
+            product.itemPrice.toStringAsFixed(2));
       },
     );
   }
 
-  Widget _buildProductItem(String name, String price) {
+  Widget _buildProductItem(String name, String quantity, String price) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
@@ -89,15 +92,24 @@ class ListScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Row(
               children: [
+                Text(
+                  quantity.isNotEmpty ? quantity : '',
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Text(
                   price.isNotEmpty ? price : '',
                   style: const TextStyle(
@@ -121,9 +133,7 @@ class ListScreen extends StatelessWidget {
 
   Widget _buildActionButtons(BuildContext context) {
     return ActionButtons(
-      onListPressed: () {
-
-      },
+      onListPressed: () {},
       onScanPressed: () {
         Navigator.of(context).pushReplacementNamed('/home');
       },

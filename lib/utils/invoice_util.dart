@@ -2,16 +2,16 @@ import 'package:projeto_integrador_6/models/invoice_item.dart';
 
 class InvoiceUtil {
   static bool isInvoice(String ocrText) {
-    if (ocrText.contains(RegExp(r'\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}')) && // CNPJ
-        ocrText.contains(RegExp(r'\d{2}\/\d{2}\/\d{4}')) && // Data
-        (ocrText.contains("NFC-e") || ocrText.contains("NOTA FISCAL") || ocrText.contains("CUPOM FISCAL"))) {
-      return true;
-    }
-    return false;
+    final RegExp regex = RegExp(
+        r'nfc-e|nota fiscal|cupom fiscal|cupon fiscal|cupon fiscol|cupom fiscol|CUPOM EISCAL',
+        caseSensitive: false);
+    return regex.hasMatch(ocrText);
   }
 
   List<InvoiceItem> extractInvoiceItemsFromText(String ocrText) {
     List<InvoiceItem> items = [];
+    List<String> namesAlreadyUsed = [];
+    // String formattedText = improveOCRFormatting(ocrText);
     List<String> lines = ocrText.split('\n');
 
     // Passa por todas as linhas, quando acha um preço tenta achar
@@ -21,31 +21,34 @@ class InvoiceUtil {
       String line = lines[i];
       double? price = extractItemPrice(line);
 
-      print('linha: $line');
       if (price == null) continue;
-      print('Preço: $price');
 
       String? name;
       int? quantity;
 
       for (int j = i - 1; j >= i - 3 && j >= 0; j--) {
-        print('\nprocurando nome nas linhas anteriores, linha atual: ');
-        print(lines[j]);
-        name = extractItemName(lines[j]);
-        quantity ??= extractItemQuantity(lines[j]);
-        if (name != null) {
-          print('nome encontrado: $name');
+        String? extractedName = extractItemName(lines[j]);
+        int? extractedQuantity = extractItemQuantity(lines[j]);
+
+        if (extractedName != null &&
+            !namesAlreadyUsed.contains(extractedName)) {
+          name = extractedName;
+          namesAlreadyUsed.add(name);
+          quantity = extractedQuantity ?? quantity;
           break;
         }
       }
 
       if (name == null) {
         for (int j = i + 1; j <= i + 2 && j < lines.length; j++) {
-          print('\nprocurando nome nas linhas posteriores, linha atual: ');
-          name = extractItemName(lines[j]);
-          quantity ??= extractItemQuantity(lines[j]);
-          if (name != null) {
-            print('nome encontrado: $name');
+          String? extractedName = extractItemName(lines[j]);
+          int? extractedQuantity = extractItemQuantity(lines[j]);
+
+          if (extractedName != null &&
+              !namesAlreadyUsed.contains(extractedName)) {
+            name = extractedName;
+            namesAlreadyUsed.add(name);
+            quantity = extractedQuantity ?? quantity;
             break;
           }
         }
@@ -53,7 +56,8 @@ class InvoiceUtil {
 
       quantity ??= 1;
       if (name != null) {
-        items.add(InvoiceItem(itemName: name, itemQuantity: quantity, itemPrice: price));
+        items.add(InvoiceItem(
+            itemName: name, itemQuantity: quantity, itemPrice: price));
       }
     }
 
@@ -61,31 +65,83 @@ class InvoiceUtil {
   }
 
   String? extractItemName(String text) {
-    final regex = RegExp(r'(?<!\d)[A-Za-z]{2,}[A-Za-z0-9\s-.]+');
-    final match = regex.firstMatch(text);
-    if (match != null) {
-      String name = match.group(0)!.trim();
-      final unwantedWords = ['RS', 'R\$', 'UN', 'UNI', 'UNID', 'KG', 'G', 'ML', 'L', 'iuni', 'iun', 'i un', 'i uni', 'total', 'subtotal', 'descontos', 'acrescimos'];
-      for (var word in unwantedWords) {
-        name = name.replaceAll(RegExp(r'\b' + word + r'\b', caseSensitive: false), '');
-      }
-      name = name.replaceAll(RegExp(r'\s+'), ' ').trim();
-      return name.isNotEmpty ? name : null;
+    final regex = RegExp(r'(?<!\d)[A-Za-z]{2,}[A-Za-z\d\s-.]+');
+    var match = regex.firstMatch(text);
+
+    if (match == null) return null;
+
+    String name = match.group(0)!.trim();
+
+    final unwantedWords = [
+      'RS',
+      'R\$',
+      'UN',
+      'UNI',
+      'UNID',
+      'UNIT',
+      'KG',
+      'G',
+      'ML',
+      'VL',
+      'L',
+      'X',
+      'F',
+      'T',
+      'I',
+      'iuni',
+      'iun',
+      'i un',
+      'i uni',
+      'total',
+      'totai',
+      'extrato',
+      'atendente',
+      'subtotal',
+      'descontos',
+      'acrescimos',
+      'VL',
+      'descricao',
+      'qtde',
+      'cupom',
+      'cupon',
+      'fiscal',
+      'eletronico',
+      'SAT',
+      'unit',
+      'st',
+      'Venda',
+      'cartao',
+      'contribuinte',
+      'CPF',
+      'CNPJ'
+    ];
+
+    for (var word in unwantedWords) {
+      name = name.replaceAll(
+          RegExp(r'\b' + word + r'\b', caseSensitive: false), '');
     }
-    return null;
+
+    name = name.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    return name.isNotEmpty && regex.hasMatch(name) ? name : null;
   }
 
   int? extractItemQuantity(String text) {
-    final regex = RegExp(r'(\d{1,2})\s*(UN|UNI|UNID)', caseSensitive: false);
+    final regex =
+        RegExp(r'(?:i\s*)?(\d{1,2})?\s*(un|uni|unid)', caseSensitive: false);
     final match = regex.firstMatch(text);
+
     if (match != null) {
-      return int.tryParse(match.group(1)!);
+      return match.group(1) != null ? int.tryParse(match.group(1)!) : 1;
     }
+
     return null;
   }
 
   double? extractItemPrice(String text) {
-    final regex = RegExp(r'(?<![&(\d])([1-9]\d{0,2}[,\.]\d{2})(?!.*[&\d{1,3}[,\.]\d{2}])');
+    final regex = RegExp(
+        r'(?<![&(\d])([1-9]\d{0,2}[,\.]\d{2})(?!.*[&\d{1,3}[,\.]\d{2}])');
+
     final match = regex.firstMatch(text);
     if (match != null) {
       return double.tryParse(match.group(1)!.replaceAll(',', '.'));
@@ -94,7 +150,41 @@ class InvoiceUtil {
   }
 
   String improveOCRFormatting(String ocrText) {
-    return 'teste';
+    final RegExp regexNfc = RegExp(
+        r'nfc-e|nota fiscal|cupom fiscal|cupon fiscal|cupon fiscol|cupom fiscol|CUPOM EISCAL',
+        caseSensitive: false);
+    final Match? match1 = regexNfc.firstMatch(ocrText);
+
+    // corta tudo que ta antes da frase cupom fiscal
+    if (match1 != null) {
+      ocrText = ocrText.substring(match1.end);
+    }
+
+    final RegExp regexTotal =
+        RegExp(r'total|totai|t0tal|t0tai', caseSensitive: false);
+    final Iterable<Match> totalMatches = regexTotal.allMatches(ocrText);
+
+    // vê se tem mais de 1 match com a palavra total
+    if (totalMatches.length > 1) {
+      // corta tudo antes do primeiro total
+      final Match firstTotalMatch = totalMatches.first;
+      final Match lastTotalMatch = totalMatches.last;
+
+      // corta a partir do final do primeiro total
+      String ocrTextAfterFirstTotal = ocrText.substring(firstTotalMatch.end);
+
+      // corta tudo depois do último total
+      String ocrTextBeforeLastTotal =
+          ocrText.substring(0, lastTotalMatch.start);
+
+      // retorna o texto entre o primeiro e o último total
+      ocrText = ocrTextAfterFirstTotal.substring(
+          0,
+          ocrTextAfterFirstTotal.length -
+              (ocrText.length - ocrTextBeforeLastTotal.length));
+    }
+
+    return ocrText;
   }
 
   String invoiceItemsToString(List<InvoiceItem> itens) {

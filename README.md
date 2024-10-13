@@ -11,3 +11,7 @@ Repositório para o Projeto Integrador VI. Tem que Querê
 - utils/ 
 - widgets/ botões, inputs, essas coisas
 - main.dart
+
+## antes de commitar vai no cmd, entra na pasta do ProjetoIntegradorVI e escreve esses comandos:
+- dart format --set-exit-if-changed .
+- flutter analyze

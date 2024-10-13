@@ -9,7 +9,8 @@ class UpdatePasswordScreen extends StatelessWidget {
     // Controllers para registrar usuário:
     final TextEditingController emailController = TextEditingController();
     final TextEditingController senhaController = TextEditingController();
-    final TextEditingController confirmarSenhaController = TextEditingController();
+    final TextEditingController confirmarSenhaController =
+        TextEditingController();
 
     // Validar o formulário:
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -103,23 +104,29 @@ class UpdatePasswordScreen extends StatelessWidget {
                   // BOTÃO ATUALIZAR SENHA
                   ElevatedButton(
                     onPressed: () async {
-                      if (formKey.currentState != null && formKey.currentState!.validate()) {
+                      if (formKey.currentState != null &&
+                          formKey.currentState!.validate()) {
                         String email = emailController.text.trim();
                         String senha = senhaController.text.trim();
 
                         bool success = await MongoDatabase.update(email, senha);
+                        if (!context.mounted) return;
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Senha atualizada com sucesso!'))
-                          );
-                          Future.delayed(Duration(seconds: 2), () {
-                          Navigator.of(context).pushReplacementNamed('/login');
-                        });
+                              const SnackBar(
+                                  content:
+                                      Text('Senha atualizada com sucesso!')));
+                          Future.delayed(const Duration(seconds: 2), () {
+                            if (context.mounted) {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/home');
+                            }
+                          });
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Erro: Nenhum usuário encontrado com esse e-mail!'))
-                          );
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text(
+                                  'Erro: Nenhum usuário encontrado com esse e-mail!')));
                         }
                       }
                     },
@@ -130,8 +137,8 @@ class UpdatePasswordScreen extends StatelessWidget {
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text(
-                        'Atualizar senha', style: TextStyle(color: Colors.white)),
+                    child: const Text('Atualizar senha',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),

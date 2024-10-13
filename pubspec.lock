@@ -216,118 +216,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  google_ml_kit:
-    dependency: "direct main"
-    description:
-      name: google_ml_kit
-      sha256: b13339964c3e8dcc8f6b9ebdee46661d86ec5f1b88263cac441043704ef7c9bd
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.11.0"
-  google_mlkit_barcode_scanning:
-    dependency: transitive
-    description:
-      name: google_mlkit_barcode_scanning
-      sha256: "15c5ae8d5c7746b436b19487b7820997bc43094e2c5ad9f23b6ff803543d92ae"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
   google_mlkit_commons:
     dependency: transitive
     description:
       name: google_mlkit_commons
-      sha256: af63771903947d5523d9e991a939a4b8bf994f11661c9b9c8a71d7d3997115f8
+      sha256: "7e9a6d6e66b44aa8cfe944bda9bc3346c52486dd890ca49e5bc98845cda40d7f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
-  google_mlkit_digital_ink_recognition:
-    dependency: transitive
-    description:
-      name: google_mlkit_digital_ink_recognition
-      sha256: "033e72d42de6c12bc6ff2eca59ee22ab1aff9c0b1eb6f06ed147763c3e93b53b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_entity_extraction:
-    dependency: transitive
-    description:
-      name: google_mlkit_entity_extraction
-      sha256: "5343972f18653d201fc4d6f3e2fa04f262432688f6ea922da661b14217a9d5ad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_face_detection:
-    dependency: transitive
-    description:
-      name: google_mlkit_face_detection
-      sha256: "1005699772656ad1f90e79e452593f6bdc52107df5431a53786f276cae79ff7f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_image_labeling:
-    dependency: transitive
-    description:
-      name: google_mlkit_image_labeling
-      sha256: bfbcb638bb3397b559ba77e544db7582a38a9841345d17382a89611ef8785f9f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_language_id:
-    dependency: transitive
-    description:
-      name: google_mlkit_language_id
-      sha256: "35a55424cc6bc98ca107da9f2b0ca78183c5f499e2085729f74dd104b0dfa4e5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_object_detection:
-    dependency: transitive
-    description:
-      name: google_mlkit_object_detection
-      sha256: f816b473bce6726c5dc3850e5cefe840b8ef38ad3ddd051bafb3cb70e660f6cf
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_pose_detection:
-    dependency: transitive
-    description:
-      name: google_mlkit_pose_detection
-      sha256: "656a0079c15e5dc411ea9a2fe03c94198cb0cfb340b7d3aaf8d1c4f58c74709c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
-  google_mlkit_selfie_segmentation:
-    dependency: transitive
-    description:
-      name: google_mlkit_selfie_segmentation
-      sha256: "30e74a5f85a37dddff582ae22a1a4e2159be6afc1f47d3f91a8e43b6ba0b0a85"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
-  google_mlkit_smart_reply:
-    dependency: transitive
-    description:
-      name: google_mlkit_smart_reply
-      sha256: "4f9d442864c9341330feeed475cb097159a27c1053631f422b6222c1023425ba"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
+    version: "0.9.0"
   google_mlkit_text_recognition:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_mlkit_text_recognition
-      sha256: "370eaa15a1e051c4a645d91cb5315d0b7dd59494425d02cf0ed8ff2b573120ff"
+      sha256: e7609cec8de3022680a36ead8a8bafa9fd2360ea018a728feaad12dcb0e3c177
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
-  google_mlkit_translation:
-    dependency: transitive
-    description:
-      name: google_mlkit_translation
-      sha256: "01886b7a38478a713265b0f519396c4e4b1c3b8390b11b5ae447fd55b12a5031"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.0"
+    version: "0.14.0"
   http:
     dependency: transitive
     description:

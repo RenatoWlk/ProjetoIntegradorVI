@@ -6,5 +6,9 @@ class Invoice {
   final double totalPrice;
   List<InvoiceItem> invoiceItems;
 
-  Invoice({required this.userId, required this.orderDate, required this.totalPrice, this.invoiceItems = const []});
+  Invoice(
+      {required this.userId,
+      required this.orderDate,
+      required this.totalPrice,
+      this.invoiceItems = const []});
 }

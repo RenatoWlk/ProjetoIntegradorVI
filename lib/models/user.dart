@@ -5,5 +5,11 @@ class User {
   final String telephone;
   List<String> invoicesIds;
 
-  User({required this.name, required this.email, required this.password, required this.telephone, this.invoicesIds = const [],});
+  User({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.telephone,
+    this.invoicesIds = const [],
+  });
 }

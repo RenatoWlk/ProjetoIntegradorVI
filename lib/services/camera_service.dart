@@ -21,6 +21,13 @@ class CameraService with ChangeNotifier {
     return await _controller.takePicture();
   }
 
+  Future<void> disableFlash() async {
+    if (_controller.value.flashMode != FlashMode.off) {
+      await _controller.setFlashMode(FlashMode.off);
+      notifyListeners();
+    }
+  }
+
   Future<void> toggleFlash() async {
     if (_controller.value.flashMode == FlashMode.off) {
       await _controller.setFlashMode(FlashMode.torch);

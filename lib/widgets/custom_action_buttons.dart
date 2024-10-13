@@ -23,14 +23,12 @@ class ActionButtons extends StatelessWidget {
           heroTag: 'list_fab',
           child: const Icon(Icons.list_alt, size: 40),
         ),
-
         FloatingActionButton(
           onPressed: onScanPressed,
           backgroundColor: Colors.orange,
           heroTag: 'scan_fab',
           child: const Icon(Icons.document_scanner, size: 40),
         ),
-
         FloatingActionButton(
           onPressed: onHistoryPressed,
           backgroundColor: Colors.white,

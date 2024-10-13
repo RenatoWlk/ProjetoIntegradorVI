@@ -47,8 +47,7 @@ class RegisterScreen extends StatelessWidget {
                       icon: Icon(Icons.perm_identity_outlined),
                       labelText: 'Nome',
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))
-                      ),
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -147,7 +146,8 @@ class RegisterScreen extends StatelessWidget {
                   // BOTÃO CRIAR CONTA
                   ElevatedButton(
                     onPressed: () async {
-                      if (formKey.currentState != null && formKey.currentState!.validate()) {
+                      if (formKey.currentState != null &&
+                          formKey.currentState!.validate()) {
                         User newUser = User(
                           name: nomeController.text,
                           email: emailController.text,
@@ -156,16 +156,23 @@ class RegisterScreen extends StatelessWidget {
                         );
                         bool success = await MongoDatabase.register(newUser);
 
+                        if (!context.mounted) return;
+
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Cadastro realizado com sucesso!'))
-                          );
+                              const SnackBar(
+                                  content:
+                                      Text('Cadastro realizado com sucesso!')));
                           Future.delayed(const Duration(seconds: 2), () {
-                            Navigator.of(context).pushReplacementNamed('/home');
+                            if (context.mounted) {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/home');
+                            }
                           });
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Erro: E-mail já cadastrado!')),
+                            const SnackBar(
+                                content: Text('Erro: E-mail já cadastrado!')),
                           );
                         }
                       }
@@ -177,9 +184,8 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    child: const Text(
-                        'Criar conta', style: TextStyle(color: Colors.white)
-                    ),
+                    child: const Text('Criar conta',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
