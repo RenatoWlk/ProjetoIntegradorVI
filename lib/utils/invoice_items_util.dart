@@ -1,6 +1,6 @@
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 
-class InvoiceUtil {
+class InvoiceItemsUtil {
   static bool isInvoice(String ocrText) {
     final RegExp regex = RegExp(
         r'nfc-e|nota fiscal|cupom fiscal|cupon fiscal|cupon fiscol|cupom fiscol|CUPOM EISCAL',

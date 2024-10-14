@@ -50,4 +50,12 @@ class InvoiceItemsProvider with ChangeNotifier {
     _invoiceItems.add(newItem);
     notifyListeners();
   }
+
+  double getTotalPrice() {
+    double totalPrice = 0.0;
+    for (int i = 0; i < _invoiceItems.length; i++) {
+      totalPrice += _invoiceItems[i].itemPrice;
+    }
+    return totalPrice;
+  }
 }

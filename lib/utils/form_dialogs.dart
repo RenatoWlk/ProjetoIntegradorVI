@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 
 class FormDialogs {
   void editItemField(BuildContext context, String title, String currentValue,
@@ -76,7 +80,7 @@ class FormDialogs {
                 decoration: const InputDecoration(labelText: 'Preço'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
+                  FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))
                 ],
               )
             ],
@@ -145,5 +149,82 @@ class FormDialogs {
             ],
           );
         });
+  }
+
+  void showSaveListDialog(
+      BuildContext context, InvoiceItemsProvider invoiceItemsProvider) {
+    final titleController = TextEditingController(text: 'Lista');
+    final dateController = TextEditingController(
+        text: DateFormat('dd/MM/yyyy').format(DateTime.now()).toString());
+    final invoiceProvider =
+        Provider.of<InvoiceProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Salvar Lista'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Título da Lista'),
+              ),
+              TextField(
+                controller: dateController,
+                decoration:
+                    const InputDecoration(labelText: 'Data (DD/MM/AAAA)'),
+                keyboardType: TextInputType.datetime,
+                inputFormatters: [MaskTextInputFormatter(mask: '##/##/####')],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                final title = titleController.text;
+                final date = dateController.text;
+                final totalPrice = invoiceItemsProvider.getTotalPrice();
+
+                if (title.isNotEmpty && date.isNotEmpty && totalPrice > 0) {
+                  final newInvoice = Invoice(
+                    userId:
+                        1, // TODO: Pegar o id do usuario e passar por parametro pra cá de algum jeito
+                    invoiceTitle: title,
+                    orderDate: date,
+                    totalPrice: totalPrice,
+                    invoiceItems: invoiceItemsProvider.invoiceItems,
+                  );
+
+                  invoiceProvider.addInvoice(newInvoice);
+
+                  Navigator.of(context).pop();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Lista salva com sucesso!')),
+                  );
+
+                  Navigator.of(context).pushReplacementNamed('/history');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Erro ao salvar lista. Verifique os campos.')),
+                  );
+                }
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

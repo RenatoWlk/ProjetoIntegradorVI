@@ -23,6 +23,8 @@ dependencies:
   mongo_dart: ^0.10.3
   google_mlkit_text_recognition: ^0.14.0
   flutter_bcrypt: ^1.0.8
+  mask_text_input_formatter: ^2.9.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

@@ -12,7 +12,7 @@ import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
-import 'package:projeto_integrador_6/utils/invoice_util.dart';
+import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
 
 class HomeScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -36,10 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    if (mounted) {
+    if (cameraService.isInitialized) {
       cameraService.disableFlash();
-      cameraService.dispose();
     }
+    cameraService.dispose();
     super.dispose();
   }
 
@@ -125,25 +125,29 @@ class _HomeScreenState extends State<HomeScreen> {
       OCRService ocrService,
       OCRProvider ocrProvider,
       InvoiceItemsProvider invoiceItemsProvider) {
+    bool isCapturing = false;
+
     return ActionButtons(
         onListPressed: () {
           Navigator.of(context).pushReplacementNamed('/list');
         },
         onScanPressed: () async {
+          if (isCapturing) return;
+          isCapturing = true;
           try {
             if (!context.mounted) return;
-            final InvoiceUtil invoiceUtil = InvoiceUtil();
+            final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
             final image = await cameraService.captureImage();
             String text = await ocrService.extractTextFromImage(image.path);
-            bool isInvoice = InvoiceUtil.isInvoice(text);
+            bool isInvoice = InvoiceItemsUtil.isInvoice(text);
             if (!context.mounted) return;
 
             if (isInvoice) {
               List<InvoiceItem> items =
-                  invoiceUtil.extractInvoiceItemsFromText(text);
+                  invoiceItemsUtil.extractInvoiceItemsFromText(text);
               invoiceItemsProvider.addInvoiceItems(items);
-              ocrProvider
-                  .updateExtractedText(invoiceUtil.invoiceItemsToString(items));
+              ocrProvider.updateExtractedText(
+                  invoiceItemsUtil.invoiceItemsToString(items));
 
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Escaneado com sucesso!')));
@@ -167,6 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Erro ao escanear a imagem.')),
             );
+          } finally {
+            isCapturing = false;
           }
         },
         onHistoryPressed: () {

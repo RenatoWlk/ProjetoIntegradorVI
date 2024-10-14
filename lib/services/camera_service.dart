@@ -5,6 +5,7 @@ class CameraService with ChangeNotifier {
   late CameraController _controller;
 
   CameraController get controller => _controller;
+  bool get isInitialized => _controller.value.isInitialized;
 
   Future<void> initialize(CameraDescription camera) async {
     _controller = CameraController(camera, ResolutionPreset.max);

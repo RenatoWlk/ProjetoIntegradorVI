@@ -36,7 +36,8 @@ class ListScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 50.0),
             child: Column(
               children: [
-                _buildListActionButtons(context, formDialogs),
+                _buildListActionButtons(
+                    context, invoiceItemsProvider, formDialogs),
                 const SizedBox(height: 20),
                 _buildActionButtons(context),
               ],
@@ -226,8 +227,8 @@ class ListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListActionButtons(
-      BuildContext context, FormDialogs formDialogs) {
+  Widget _buildListActionButtons(BuildContext context,
+      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -235,7 +236,7 @@ class ListScreen extends StatelessWidget {
         const SizedBox(width: 20),
         _buildAddItemButton(context, formDialogs),
         const SizedBox(width: 20),
-        _buildSaveListButton(context),
+        _buildSaveListButton(context, invoiceItemsProvider, formDialogs),
       ],
     );
   }
@@ -259,18 +260,17 @@ class ListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveListButton(BuildContext context) {
+  Widget _buildSaveListButton(BuildContext context,
+      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
     return FloatingActionButton(
       onPressed: () {
-        // TODO: salvar lista
-        // - criar um objeto invoice com os invoiceitems;
-        // - criar invoice_provider;
-        // - criar novo invoice e notificar os listeners (tela histórico);
-        // - redirecionar para histórico;
-        // - vai corinthians;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lista salva com sucesso!')),
-        );
+        if (invoiceItemsProvider.invoiceItems.isNotEmpty) {
+          formDialogs.showSaveListDialog(context, invoiceItemsProvider);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sua lista está vazia!')),
+          );
+        }
       },
       backgroundColor: Colors.blue,
       heroTag: 'save_fab',

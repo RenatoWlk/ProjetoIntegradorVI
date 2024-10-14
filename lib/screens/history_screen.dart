@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-
+import 'package:projeto_integrador_6/models/invoice.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
+import 'package:provider/provider.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final invoiceProvider = Provider.of<InvoiceProvider>(context);
     return Scaffold(
       endDrawer: _buildDrawer(context),
       body: Column(
@@ -22,7 +25,7 @@ class HistoryScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildHistoryList(),
+                  _buildHistoryList(invoiceProvider),
                 ],
               ),
             ),
@@ -58,27 +61,25 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryList() {
-    final items = [
-      {'title': 'Lista + Comprados', 'date': ''},
-      {'title': 'Lista', 'date': '26/09/24'},
-      {'title': 'Lista', 'date': '26/09/24'},
-      {'title': 'Lista', 'date': '26/09/24'},
-    ];
+  Widget _buildHistoryList(InvoiceProvider invoiceProvider) {
+    final invoices = invoiceProvider.invoices;
 
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
+      itemCount: invoices.length,
       itemBuilder: (context, index) {
-        final item = items[index];
-        return _buildHistoryItem(
-            item['title'] as String, item['date'] as String);
+        final invoice = invoices[index];
+        return _buildHistoryItem(context, invoice, index);
       },
     );
   }
 
-  Widget _buildHistoryItem(String title, String date) {
+  Widget _buildHistoryItem(BuildContext context, Invoice invoice, int index) {
+    final invoiceTitle = invoice.invoiceTitle;
+    final orderDate = invoice.orderDate;
+    final totalPrice = invoice.totalPrice.toString();
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
@@ -90,17 +91,20 @@ class HistoryScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '$title ${date.isNotEmpty ? date : ''}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                '$invoiceTitle - $orderDate - R\$$totalPrice',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.cancel_outlined),
+              icon: const Icon(Icons.manage_history, size: 35),
+              iconSize: 35,
               onPressed: () {
-                // TODO: Remover item da lista
+                _showInvoiceDetailsDialog(context, invoice);
               },
             ),
           ],
@@ -140,6 +144,70 @@ class HistoryScreen extends StatelessWidget {
       onLogoutTap: () {
         // TODO: Logout
         Navigator.pop(context);
+      },
+    );
+  }
+
+  void _showInvoiceDetailsDialog(BuildContext context, Invoice invoice) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Detalhes - ${invoice.invoiceTitle}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Data: ${invoice.orderDate}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Total: R\$${invoice.totalPrice.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Itens da Lista:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 400,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: invoice.invoiceItems.length,
+                    itemBuilder: (context, index) {
+                      final item = invoice.invoiceItems[index];
+                      return ListTile(
+                        title: Text(item.itemName),
+                        subtitle: Text(
+                            'Quantidade: ${item.itemQuantity} | Preço: R\$${item.itemPrice.toStringAsFixed(2)}'),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Fechar'),
+            ),
+          ],
+        );
       },
     );
   }
