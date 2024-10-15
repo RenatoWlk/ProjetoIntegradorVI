@@ -192,11 +192,11 @@ class FormDialogs {
                 final title = titleController.text;
                 final date = dateController.text;
                 final totalPrice = invoiceItemsProvider.getTotalPrice();
+                final userEmail = user.email.trim();
 
                 if (title.isNotEmpty && date.isNotEmpty && totalPrice > 0) {
                   final newInvoice = Invoice(
-                    userId:
-                        1, // TODO: Pegar o id do usuario e passar por parametro pra cá de algum jeito
+                    userEmail: userEmail,
                     invoiceTitle: title,
                     orderDate: date,
                     totalPrice: totalPrice,
