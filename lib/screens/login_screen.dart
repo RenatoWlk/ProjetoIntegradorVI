@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 import '../services/database/database.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -147,6 +149,7 @@ class LoginScreen extends StatelessWidget {
                         if (!context.mounted) return;
 
                         if (success) {
+                          Provider.of<UserProvider>(context, listen: false).setEmail(email);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content:

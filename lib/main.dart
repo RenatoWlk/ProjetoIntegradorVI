@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:projeto_integrador_6/providers/user_provider.dart';
 // import 'package:projeto_integrador_6/screens/home_screen.dart';
 import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
@@ -44,6 +45,9 @@ class App extends StatelessWidget {
         ),
         ChangeNotifierProvider<InvoiceProvider>(
           create: (context) => InvoiceProvider(),
+        ),
+        ChangeNotifierProvider<UserProvider>(
+        create: (_) => UserProvider(),
         ),
       ],
       child: MaterialApp(

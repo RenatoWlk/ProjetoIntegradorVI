@@ -7,6 +7,8 @@ import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 
+import '../providers/user_provider.dart';
+
 class FormDialogs {
   void editItemField(BuildContext context, String title, String currentValue,
       Function(String) onSave) {
@@ -192,7 +194,7 @@ class FormDialogs {
                 final title = titleController.text;
                 final date = dateController.text;
                 final totalPrice = invoiceItemsProvider.getTotalPrice();
-                final userEmail = user.email.trim();
+                final userEmail = Provider.of<UserProvider>(context).email;
 
                 if (title.isNotEmpty && date.isNotEmpty && totalPrice > 0) {
                   final newInvoice = Invoice(
