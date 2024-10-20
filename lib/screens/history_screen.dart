@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:projeto_integrador_6/providers/user_provider.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 import 'package:provider/provider.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  HistoryScreenState createState() => HistoryScreenState();
+}
+
+class HistoryScreenState extends State<HistoryScreen> {
+  late Future<bool> _futureInvoices;
+
+  @override
+  void initState() {
+    super.initState();
+    final userEmail = Provider.of<UserProvider>(context, listen: false).email;
+    _futureInvoices = Provider.of<InvoiceProvider>(context, listen: false)
+        .getInvoicesByEmail(userEmail);
+  }
 
   @override
   Widget build(BuildContext context) {
     final invoiceProvider = Provider.of<InvoiceProvider>(context);
+
     return Scaffold(
       endDrawer: _buildDrawer(context),
       body: Column(
@@ -25,7 +42,23 @@ class HistoryScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildHistoryList(invoiceProvider),
+                  FutureBuilder<bool>(
+                    future: _futureInvoices,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                            child: Text('Erro ao carregar o histórico.'));
+                      } else if (!snapshot.hasData ||
+                          snapshot.data == false ||
+                          invoiceProvider.invoices.isEmpty) {
+                        return const Center(
+                            child: Text('Nenhuma nota fiscal encontrada.'));
+                      }
+                      return _buildHistoryList(invoiceProvider);
+                    },
+                  ),
                 ],
               ),
             ),

@@ -2,22 +2,15 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 
 String preprocessImage(String imagePath) {
-  final originalImage = img.decodeImage(File(imagePath).readAsBytesSync())!;
-
-  // Deixa em escala de cinza
-  // final grayscaleImage = img.grayscale(originalImage);
-
-  // AUmenta o contraste
-  final contrastImage = img.adjustColor(originalImage, contrast: 1.5);
-
-  // Tira o blur
-  // final unblurredImage = img.gaussianBlur(originalImage, radius: 0);
-
-  // Deixa a imagem em preto e branco
-  // final bwImage = img.luminanceThreshold(contrastImage, outputColor: false);
-
+  img.Image image = img.decodeImage(File(imagePath).readAsBytesSync())!;
+  image =
+      img.copyResize(image, width: image.width * 2, height: image.height * 2);
+  // image = img.gaussianBlur(image, radius: 0);
+  image = img.grayscale(image);
+  image = img.adjustColor(image, contrast: 2, brightness: 0.75);
+  // image = img.luminanceThreshold(image, outputColor: false);
   final processedImagePath = '$imagePath-processed.png';
-  File(processedImagePath).writeAsBytesSync(img.encodePng(contrastImage));
+  File(processedImagePath).writeAsBytesSync(img.encodePng(image));
 
   return processedImagePath;
 }

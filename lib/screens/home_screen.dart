@@ -1,48 +1,23 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
-import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:provider/provider.dart';
-
+import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
-import 'package:projeto_integrador_6/services/camera_service.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
-import 'package:projeto_integrador_6/widgets/camera_preview_widget.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 
 class HomeScreen extends StatefulWidget {
-  final CameraDescription camera;
-
-  const HomeScreen({super.key, required this.camera});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<void> _initializeCameraFuture;
-  late CameraService cameraService;
-
-  @override
-  void initState() {
-    super.initState();
-    cameraService = Provider.of<CameraService>(context, listen: false);
-    _initializeCameraFuture = cameraService.initialize(widget.camera);
-  }
-
-  @override
-  void dispose() {
-    if (cameraService.isInitialized) {
-      cameraService.disableFlash();
-    }
-    cameraService.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final ocrService = Provider.of<OCRService>(context);
@@ -62,15 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 40),
-                  _buildCameraPreview(context, cameraService),
+                  _buildPageView(
+                      context, ocrService, ocrProvider, invoiceItemsProvider),
                 ],
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
-            child: _buildActionButtons(context, cameraService, ocrService,
-                ocrProvider, invoiceItemsProvider),
+            child: _buildActionButtons(context),
           ),
         ],
       ),
@@ -99,86 +74,151 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCameraPreview(
-      BuildContext context, CameraService cameraService) {
-    return FutureBuilder<void>(
-      future: _initializeCameraFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: const CameraPreviewWidget(),
-          );
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
+  Widget _buildPageView(BuildContext context, OCRService ocrService,
+      OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) {
+    return SizedBox(
+      height: 700,
+      child: Center(
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 30,
+          crossAxisSpacing: 30,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _buildScanButton(
+                context, ocrService, ocrProvider, invoiceItemsProvider),
+            _buildPdfButton(),
+            _buildUploadImageButton(),
+            _buildHelpButton(),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildActionButtons(
-      BuildContext context,
-      CameraService cameraService,
-      OCRService ocrService,
-      OCRProvider ocrProvider,
-      InvoiceItemsProvider invoiceItemsProvider) {
-    bool isCapturing = false;
+  Widget _buildButton(
+      String label, IconData icon, Color color, VoidCallback onPressed) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      onPressed: onPressed,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 65, color: Colors.white),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
 
-    return ActionButtons(
-        onListPressed: () {
-          Navigator.of(context).pushReplacementNamed('/list');
-        },
-        onScanPressed: () async {
-          if (isCapturing) return;
-          isCapturing = true;
-          try {
-            if (!context.mounted) return;
-            final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
-            final image = await cameraService.captureImage();
-            String text = await ocrService.extractTextFromImage(image.path);
+  Widget _buildScanButton(BuildContext context, OCRService ocrService,
+      OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) {
+    return _buildButton(
+      "Escanear Nota Fiscal",
+      Icons.receipt_long_outlined,
+      Colors.orange,
+      () async {
+        try {
+          List<String> pictures =
+              await CunningDocumentScanner.getPictures() ?? [];
+          if (pictures.isNotEmpty) {
+            String text = await ocrService.extractTextFromImage(pictures.first);
             bool isInvoice = InvoiceItemsUtil.isInvoice(text);
-            if (!context.mounted) return;
-
             if (isInvoice) {
+              final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
               List<InvoiceItem> items =
                   invoiceItemsUtil.extractInvoiceItemsFromText(text);
               invoiceItemsProvider.addInvoiceItems(items);
               ocrProvider.updateExtractedText(
                   invoiceItemsUtil.invoiceItemsToString(items));
+              if (!context.mounted) return;
 
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Escaneado com sucesso!')));
-              Future.delayed(const Duration(seconds: 2), () {
+                const SnackBar(content: Text('Escaneado com sucesso!')),
+              );
+              Future.delayed(const Duration(seconds: 1), () {
                 if (context.mounted) {
-                  cameraService.disableFlash();
                   Navigator.of(context).pushReplacementNamed('/list');
                 }
               });
             } else {
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text(
                         'Não foi possível identificar uma nota fiscal :(')),
               );
             }
-          } catch (e) {
-            if (kDebugMode) {
-              print('Erro escaneando a imagem: $e');
-            }
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Erro ao escanear a imagem.')),
-            );
-          } finally {
-            isCapturing = false;
           }
-        },
-        onHistoryPressed: () {
-          Navigator.of(context).pushReplacementNamed('/history');
-        },
-        scanButtonColor: Colors.orange);
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao escanear a imagem.')),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildPdfButton() {
+    return _buildButton(
+      "Escanear PDF\nde NFC-e",
+      Icons.picture_as_pdf,
+      Colors.blue,
+      () {
+        // TODO: Ler PDFs
+      },
+    );
+  }
+
+  Widget _buildUploadImageButton() {
+    return _buildButton(
+      "Carregar Imagem\nde NFC-e",
+      Icons.image_search_outlined,
+      Colors.lightBlue,
+      () {
+        // TODO: Pensar em funcionalidades novas
+      },
+    );
+  }
+
+  Widget _buildHelpButton() {
+    return _buildButton(
+      "Ajuda",
+      Icons.help_outline,
+      Colors.redAccent,
+      () {
+        // TODO: Pensar em funcionalidades novas
+      },
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return ActionButtons(
+      onListPressed: () {
+        Navigator.of(context).pushReplacementNamed('/list');
+      },
+      onScanPressed: () {},
+      onHistoryPressed: () {
+        Navigator.of(context).pushReplacementNamed('/history');
+      },
+      scanButtonColor: Colors.orange,
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {

@@ -265,7 +265,7 @@ class ListScreen extends StatelessWidget {
     return FloatingActionButton(
       onPressed: () {
         if (invoiceItemsProvider.invoiceItems.isNotEmpty) {
-          formDialogs.showSaveListDialog(context, invoiceItemsProvider);
+          formDialogs.showSaveListDialog(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sua lista está vazia!')),

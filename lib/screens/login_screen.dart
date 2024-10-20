@@ -149,7 +149,8 @@ class LoginScreen extends StatelessWidget {
                         if (!context.mounted) return;
 
                         if (success) {
-                          Provider.of<UserProvider>(context, listen: false).setEmail(email);
+                          Provider.of<UserProvider>(context, listen: false)
+                              .setEmail(email);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content:

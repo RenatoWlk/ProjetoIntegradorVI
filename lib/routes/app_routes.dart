@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 
 import 'package:projeto_integrador_6/screens/home_screen.dart';
 import 'package:projeto_integrador_6/screens/login_screen.dart';
@@ -16,9 +15,9 @@ class AppRoutes {
   static const String history = '/history';
   static const String updatePassword = '/update_password';
 
-  static Map<String, WidgetBuilder> define(CameraDescription camera) {
+  static Map<String, WidgetBuilder> define() {
     return {
-      home: (context) => HomeScreen(camera: camera),
+      home: (context) => const HomeScreen(),
       login: (context) => const LoginScreen(),
       register: (context) => const RegisterScreen(),
       list: (context) => const ListScreen(),

@@ -153,13 +153,15 @@ class FormDialogs {
         });
   }
 
-  void showSaveListDialog(
-      BuildContext context, InvoiceItemsProvider invoiceItemsProvider) {
+  void showSaveListDialog(BuildContext context) {
     final titleController = TextEditingController(text: 'Lista');
     final dateController = TextEditingController(
         text: DateFormat('dd/MM/yyyy').format(DateTime.now()).toString());
+    final invoiceItemsProvider =
+        Provider.of<InvoiceItemsProvider>(context, listen: false);
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     showDialog(
       context: context,
@@ -190,11 +192,11 @@ class FormDialogs {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 final title = titleController.text;
                 final date = dateController.text;
                 final totalPrice = invoiceItemsProvider.getTotalPrice();
-                final userEmail = Provider.of<UserProvider>(context).email;
+                final userEmail = userProvider.email;
 
                 if (title.isNotEmpty && date.isNotEmpty && totalPrice > 0) {
                   final newInvoice = Invoice(
@@ -205,15 +207,22 @@ class FormDialogs {
                     invoiceItems: invoiceItemsProvider.invoiceItems,
                   );
 
-                  invoiceProvider.addInvoice(newInvoice);
+                  bool success = await invoiceProvider.addInvoice(newInvoice);
+                  if (!context.mounted) return;
 
-                  Navigator.of(context).pop();
+                  if (success) {
+                    Navigator.of(context).pop();
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Lista salva com sucesso!')),
-                  );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Lista salva com sucesso!')),
+                    );
 
-                  Navigator.of(context).pushReplacementNamed('/history');
+                    Navigator.of(context).pushReplacementNamed('/history');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Erro ao salvar lista.')),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

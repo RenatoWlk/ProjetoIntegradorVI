@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/providers/user_provider.dart';
-// import 'package:projeto_integrador_6/screens/home_screen.dart';
+//import 'package:projeto_integrador_6/screens/home_screen.dart';
 import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
-import 'services/camera_service.dart';
 import 'services/ocr_service.dart';
 import 'providers/ocr_provider.dart';
 import 'providers/invoice_items_provider.dart';
@@ -16,16 +14,12 @@ import 'providers/invoice_items_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MongoDatabase.connect();
-  final cameras = await availableCameras();
-  final firstCamera = cameras.first;
 
-  runApp(App(camera: firstCamera));
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
-  final CameraDescription camera;
-
-  const App({super.key, required this.camera});
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +31,6 @@ class App extends StatelessWidget {
         ChangeNotifierProvider<OCRProvider>(
           create: (_) => OCRProvider(),
         ),
-        ChangeNotifierProvider<CameraService>(
-          create: (_) => CameraService(),
-        ),
         ChangeNotifierProvider<InvoiceItemsProvider>(
           create: (context) => InvoiceItemsProvider(),
         ),
@@ -47,7 +38,7 @@ class App extends StatelessWidget {
           create: (context) => InvoiceProvider(),
         ),
         ChangeNotifierProvider<UserProvider>(
-        create: (_) => UserProvider(),
+          create: (_) => UserProvider(),
         ),
       ],
       child: MaterialApp(
@@ -56,8 +47,8 @@ class App extends StatelessWidget {
           primarySwatch: Colors.grey,
         ),
         home: const LoginScreen(),
-        // home: HomeScreen(camera: camera),
-        routes: AppRoutes.define(camera),
+        //home: const HomeScreen(),
+        routes: AppRoutes.define(),
         debugShowCheckedModeBanner: false,
       ),
     );
