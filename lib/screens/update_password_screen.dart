@@ -45,6 +45,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'E-mail',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -68,6 +69,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Nova senha',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -88,6 +90,7 @@ class UpdatePasswordScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Confirmar senha',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -138,7 +141,8 @@ class UpdatePasswordScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Atualizar senha',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

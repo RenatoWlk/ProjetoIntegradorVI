@@ -82,7 +82,6 @@ class HistoryScreenState extends State<HistoryScreen> {
             'Histórico',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: "Space Grotesk",
               fontSize: 28,
               fontWeight: FontWeight.w700,
             ),
@@ -129,7 +128,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                 '$invoiceTitle - $orderDate - R\$$totalPrice',
                 style: const TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

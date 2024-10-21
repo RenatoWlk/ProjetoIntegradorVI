@@ -46,6 +46,7 @@ class RegisterScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.perm_identity_outlined),
                       labelText: 'Nome',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -65,6 +66,7 @@ class RegisterScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'Email',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -88,6 +90,7 @@ class RegisterScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Senha',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -107,6 +110,7 @@ class RegisterScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Confirmar senha',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -127,6 +131,7 @@ class RegisterScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.phone_outlined),
                       labelText: 'Telefone',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -185,7 +190,8 @@ class RegisterScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Criar conta',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

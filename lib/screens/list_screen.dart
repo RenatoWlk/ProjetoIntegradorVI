@@ -60,7 +60,6 @@ class ListScreen extends StatelessWidget {
                 'Sua Lista',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: "Space Grotesk",
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
                 ),
@@ -68,10 +67,7 @@ class ListScreen extends StatelessWidget {
               Text(
                 'Toque para editar',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: "Space Grotesk",
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic),
+                style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
               )
             ],
           ),
@@ -136,7 +132,7 @@ class ListScreen extends StatelessWidget {
                   name,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

@@ -62,7 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
             'Escaneie sua nota fiscal \n para começar a registrar!',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: "Space Grotesk",
               fontSize: 28,
               fontWeight: FontWeight.w700,
             ),
@@ -116,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label,
             style: const TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,

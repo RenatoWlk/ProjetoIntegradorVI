@@ -1,17 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/user_provider.dart';
 import '../services/database/database.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  LoginScreenState createState() => LoginScreenState();
+}
 
+class LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCredentials();
+  }
+
+  void loadCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      if (prefs.containsKey('email') && prefs.containsKey('password')) {
+        emailController.text = prefs.getString('email')!;
+        passwordController.text = prefs.getString('password')!;
+        rememberMe = true;
+        login(context);
+      }
+    });
+  }
+
+  Future<void> saveCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (rememberMe) {
+      await prefs.setString('email', emailController.text);
+      await prefs.setString('password', passwordController.text);
+    } else {
+      await prefs.remove('email');
+      await prefs.remove('password');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -36,7 +72,6 @@ class LoginScreen extends StatelessWidget {
                     Text(
                       'ANDRÉ MENDELECK LTDA.',
                       style: TextStyle(
-                        fontFamily: "Space Grotesk",
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -49,7 +84,6 @@ class LoginScreen extends StatelessWidget {
                   const Text(
                     'Bem vindo,',
                     style: TextStyle(
-                      fontFamily: "Space Grotesk",
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
                     ),
@@ -74,6 +108,7 @@ class LoginScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.email_outlined),
                       labelText: 'Email',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -94,6 +129,7 @@ class LoginScreen extends StatelessWidget {
                     decoration: const InputDecoration(
                       icon: Icon(Icons.key_outlined),
                       labelText: 'Senha',
+                      labelStyle: TextStyle(fontWeight: FontWeight.w700),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
@@ -114,10 +150,17 @@ class LoginScreen extends StatelessWidget {
                       Row(
                         children: [
                           Checkbox(
-                            value: false,
-                            onChanged: (value) {},
+                            value: rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                rememberMe = value!;
+                              });
+                            },
                           ),
-                          const Text('Lembre-se de mim'),
+                          const Text(
+                            'Lembre-se de mim',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
                         ],
                       ),
 
@@ -129,7 +172,8 @@ class LoginScreen extends StatelessWidget {
                         },
                         child: const Text('Esqueceu a senha?',
                             style: TextStyle(
-                                color: Color.fromRGBO(153, 93, 0, 1))),
+                                color: Color.fromRGBO(153, 93, 0, 1),
+                                fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ),
@@ -139,36 +183,7 @@ class LoginScreen extends StatelessWidget {
                   // BOTÃO ENTRAR NA CONTA
                   ElevatedButton(
                     onPressed: () async {
-                      if (formKey.currentState != null &&
-                          formKey.currentState!.validate()) {
-                        String email = emailController.text.trim();
-                        String password = passwordController.text.trim();
-
-                        bool success =
-                            await MongoDatabase.login(email, password);
-                        if (!context.mounted) return;
-
-                        if (success) {
-                          Provider.of<UserProvider>(context, listen: false)
-                              .setEmail(email);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Login realizado com sucesso!')));
-                          Future.delayed(const Duration(seconds: 2), () {
-                            if (context.mounted) {
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/home');
-                            }
-                          });
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    Text('Erro: E-mail ou senha incorretos!')),
-                          );
-                        }
-                      }
+                      login(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(255, 156, 0, 1),
@@ -178,7 +193,8 @@ class LoginScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Entrar na conta',
-                        style: TextStyle(color: Colors.white)),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
                   ),
 
                   const SizedBox(height: 30),
@@ -196,7 +212,8 @@ class LoginScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Criar conta',
-                        style: TextStyle(color: Colors.black)),
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),
@@ -205,5 +222,31 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void login(BuildContext context) async {
+    if (formKey.currentState != null && formKey.currentState!.validate()) {
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
+
+      bool success = await MongoDatabase.login(email, password);
+      if (!context.mounted) return;
+
+      if (success) {
+        Provider.of<UserProvider>(context, listen: false).setEmail(email);
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login realizado com sucesso!')));
+        await saveCredentials();
+        Future.delayed(const Duration(seconds: 2), () {
+          if (context.mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erro: E-mail ou senha incorretos!')),
+        );
+      }
+    }
   }
 }

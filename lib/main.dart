@@ -44,6 +44,7 @@ class App extends StatelessWidget {
       child: MaterialApp(
         title: 'ANDRÉ MENDELECK LTDA.',
         theme: ThemeData(
+          fontFamily: "Space Grotesk",
           primarySwatch: Colors.grey,
         ),
         home: const LoginScreen(),
