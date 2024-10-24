@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:projeto_integrador_6/models/invoice.dart';
-import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
-import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:provider/provider.dart';
 
-import '../providers/user_provider.dart';
+import 'package:projeto_integrador_6/models/invoice.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
+import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
+import 'package:projeto_integrador_6/providers/user_provider.dart';
 
 class FormDialogs {
   void editItemField(BuildContext context, String title, String currentValue,

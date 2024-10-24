@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:projeto_integrador_6/providers/user_provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   final VoidCallback onNewListTap;
   final VoidCallback onScanTap;
   final VoidCallback onHistoryTap;
   final VoidCallback onEditDataTap;
-  final VoidCallback onLogoutTap;
   final textColor = Colors.orange;
   final iconColor = Colors.orange;
 
@@ -15,7 +18,6 @@ class CustomDrawer extends StatelessWidget {
     required this.onScanTap,
     required this.onHistoryTap,
     required this.onEditDataTap,
-    required this.onLogoutTap,
   }) : super(key: key);
 
   @override
@@ -101,12 +103,25 @@ class CustomDrawer extends StatelessWidget {
                 leading: const Icon(Icons.exit_to_app),
                 title: const Text('SAIR',
                     style: TextStyle(fontWeight: FontWeight.w700)),
-                onTap: onLogoutTap,
+                onTap: () => handleLogout(context),
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  void handleLogout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove('email');
+    await prefs.remove('password');
+
+    if (!context.mounted) return;
+
+    Provider.of<UserProvider>(context, listen: false).setEmail('');
+
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }

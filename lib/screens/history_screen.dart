@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/providers/user_provider.dart';
-import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
-import 'package:provider/provider.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -171,10 +172,6 @@ class HistoryScreenState extends State<HistoryScreen> {
       },
       onEditDataTap: () {
         // TODO: Edição de dados
-        Navigator.pop(context);
-      },
-      onLogoutTap: () {
-        // TODO: Logout
         Navigator.pop(context);
       },
     );

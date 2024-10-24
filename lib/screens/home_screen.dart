@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
-import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
-import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
-import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
+import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -233,10 +234,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       onEditDataTap: () {
         // TODO: Edição de dados
-        Navigator.pop(context);
-      },
-      onLogoutTap: () {
-        // TODO: Logout
         Navigator.pop(context);
       },
     );

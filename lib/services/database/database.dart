@@ -1,11 +1,11 @@
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
-import 'package:projeto_integrador_6/models/user.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+
+import 'package:projeto_integrador_6/models/invoice.dart';
+import 'package:projeto_integrador_6/models/user.dart';
 import 'package:projeto_integrador_6/services/database/constants.dart';
 import 'package:projeto_integrador_6/services/encryption.dart';
-
-import '../../models/invoice.dart';
 
 class MongoDatabase {
   static final Encryption encryption = Encryption();

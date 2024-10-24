@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../providers/user_provider.dart';
-import '../services/database/database.dart';
+
+import 'package:projeto_integrador_6/providers/user_provider.dart';
+import 'package:projeto_integrador_6/services/database/database.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

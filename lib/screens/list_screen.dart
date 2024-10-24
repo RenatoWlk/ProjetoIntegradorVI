@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
-import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
-import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
+import 'package:provider/provider.dart';
+
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/utils/form_dialogs.dart';
-import 'package:provider/provider.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
+import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
+import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
 
 class ListScreen extends StatelessWidget {
   const ListScreen({super.key});
@@ -214,10 +215,6 @@ class ListScreen extends StatelessWidget {
       },
       onEditDataTap: () {
         // TODO: Edição de dados
-        Navigator.pop(context);
-      },
-      onLogoutTap: () {
-        // TODO: Logout
         Navigator.pop(context);
       },
     );
