@@ -159,6 +159,60 @@ class MongoDatabase {
     }
   }
 
+  static Future<bool> editUserData(
+      String email, Map<String, dynamic> updatedData) async {
+    Db db = await Db.create(dbURL);
+    try {
+      await db.open();
+      var collection = db.collection(usersCollectionName);
+
+      if (kDebugMode) {
+        print('Conectado ao banco de dados');
+      }
+
+      var user = await collection.findOne(where.eq('email', email));
+
+      if (user == null) {
+        if (kDebugMode) {
+          print('Email não encontrado no banco de dados');
+        }
+        return false;
+      }
+
+      // Atualiza a senha, se estiver nos dados
+      if (updatedData.containsKey('password')) {
+        updatedData['password'] =
+        await encryption.hashPassword(updatedData['password']);
+      }
+
+      // Realiza a atualização dos dados no banco
+      var result = await collection.updateOne(
+        where.eq('email', email),
+        modify.set('name', updatedData['name']),
+        // Adicione mais campos conforme necessário
+      );
+
+      if (kDebugMode) {
+        print(
+            'Resultado da atualização: ${result.nModified} documentos modificados');
+      }
+      return result.nModified > 0;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao editar dados do usuário: $e');
+      }
+      return false;
+    } finally {
+      await db.close();
+      if (kDebugMode) {
+        print('Conexão fechada');
+      }
+    }
+  }
+
+
+
+
   static Future<List<Invoice>> getInvoicesByEmail(String email) async {
     Db db = await Db.create(dbURL);
 

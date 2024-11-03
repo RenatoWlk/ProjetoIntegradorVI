@@ -230,24 +230,35 @@ class LoginScreenState extends State<LoginScreen> {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
+      // Armazene a referência do contexto antes da operação assíncrona
+      final currentContext = context;
+
       bool success = await MongoDatabase.login(email, password);
-      if (!context.mounted) return;
+
+      // Verifique se o contexto ainda está montado
+      if (!currentContext.mounted) return;
 
       if (success) {
-        Provider.of<UserProvider>(context, listen: false).setEmail(email);
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login realizado com sucesso!')));
+        // Se o contexto estiver montado, continue
+        Provider.of<UserProvider>(currentContext, listen: false).setEmail(email);
+        ScaffoldMessenger.of(currentContext).showSnackBar(
+          const SnackBar(content: Text('Login realizado com sucesso!')),
+        );
+
         await saveCredentials();
+
+        // Utilize Future.delayed com o contexto verificado
         Future.delayed(const Duration(seconds: 2), () {
-          if (context.mounted) {
-            Navigator.of(context).pushReplacementNamed('/home');
+          if (currentContext.mounted) {
+            Navigator.of(currentContext).pushReplacementNamed('/home');
           }
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(currentContext).showSnackBar(
           const SnackBar(content: Text('Erro: E-mail ou senha incorretos!')),
         );
       }
     }
   }
+
 }

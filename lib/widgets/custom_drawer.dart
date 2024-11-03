@@ -90,9 +90,13 @@ class CustomDrawer extends StatelessWidget {
                 iconColor: iconColor,
                 textColor: textColor,
                 leading: const Icon(Icons.edit),
-                title: const Text('EDITAR DADOS',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
-                onTap: onEditDataTap,
+                title: const Text(
+                  'EDITAR DADOS',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/edit_data');
+                },
               ),
               const SizedBox(height: 40.0),
 
