@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'dart:io';
 
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
@@ -19,6 +23,142 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<String> _extractTextFromPdf(String path) async {
+    final File file = File(path);
+    final PdfDocument document =
+        PdfDocument(inputBytes: await file.readAsBytes());
+    String text = '';
+
+    // Extract text from all pages
+    for (int i = 0; i < document.pages.count; i++) {
+      final PdfTextExtractor extractor = PdfTextExtractor(document);
+      text += extractor.extractText(startPageIndex: i);
+    }
+
+    document.dispose();
+    return text;
+  }
+
+  Future<void> _processPdfContent(String text, OCRProvider ocrProvider,
+      InvoiceItemsProvider invoiceItemsProvider) async {
+    bool isInvoice = InvoiceItemsUtil.isInvoice(text);
+    if (isInvoice) {
+      final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
+      List<InvoiceItem> items =
+          invoiceItemsUtil.extractInvoiceItemsFromText(text);
+      invoiceItemsProvider.addInvoiceItems(items);
+      ocrProvider
+          .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PDF processado com sucesso!')),
+      );
+      Future.delayed(const Duration(seconds: 1), () {
+        if (context.mounted) {
+          Navigator.of(context).pushReplacementNamed('/list');
+        }
+      });
+    } else {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Não foi possível identificar uma nota fiscal no PDF')),
+      );
+    }
+  }
+
+  Future<void> _processImage(
+      String imagePath,
+      OCRService ocrService,
+      OCRProvider ocrProvider,
+      InvoiceItemsProvider invoiceItemsProvider) async {
+    try {
+      String text = await ocrService.extractTextFromImage(imagePath);
+      bool isInvoice = InvoiceItemsUtil.isInvoice(text);
+      if (isInvoice) {
+        final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
+        List<InvoiceItem> items =
+            invoiceItemsUtil.extractInvoiceItemsFromText(text);
+        invoiceItemsProvider.addInvoiceItems(items);
+        ocrProvider
+            .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));
+
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Imagem processada com sucesso!')),
+        );
+        Future.delayed(const Duration(seconds: 1), () {
+          if (context.mounted) {
+            Navigator.of(context).pushReplacementNamed('/list');
+          }
+        });
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Não foi possível identificar uma nota fiscal na imagem')),
+        );
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao processar a imagem.')),
+      );
+    }
+  }
+
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Ajuda - Como usar o app'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text('1. Escanear Nota Fiscal',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Use a câmera para escanear sua nota fiscal diretamente.'),
+                SizedBox(height: 10),
+                Text('2. Escanear PDF de NFC-e',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Carregue um arquivo PDF de Nota Fiscal Eletrônica.'),
+                SizedBox(height: 10),
+                Text('3. Carregar Imagem de NFC-e',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                    'Selecione uma imagem da galeria contendo sua nota fiscal.'),
+                SizedBox(height: 10),
+                Text('4. Lista de Compras',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Visualize e gerencie seus itens escaneados.'),
+                SizedBox(height: 10),
+                Text('5. Histórico',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Acesse suas notas fiscais anteriores.'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ocrService = Provider.of<OCRService>(context);
@@ -180,8 +320,29 @@ class _HomeScreenState extends State<HomeScreen> {
       "Escanear PDF\nde NFC-e",
       Icons.picture_as_pdf,
       Colors.blue,
-      () {
-        // TODO: Ler PDFs
+      () async {
+        try {
+          FilePickerResult? result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: ['pdf'],
+          );
+
+          if (result != null && result.files.single.path != null) {
+            String text = await _extractTextFromPdf(result.files.single.path!);
+
+            final ocrProvider =
+                Provider.of<OCRProvider>(context, listen: false);
+            final invoiceItemsProvider =
+                Provider.of<InvoiceItemsProvider>(context, listen: false);
+
+            await _processPdfContent(text, ocrProvider, invoiceItemsProvider);
+          }
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao processar o PDF.')),
+          );
+        }
       },
     );
   }
@@ -191,8 +352,29 @@ class _HomeScreenState extends State<HomeScreen> {
       "Carregar Imagem\nde NFC-e",
       Icons.image_search_outlined,
       Colors.lightBlue,
-      () {
-        // TODO: Pensar em funcionalidades novas
+      () async {
+        try {
+          final XFile? image = await _imagePicker.pickImage(
+            source: ImageSource.gallery,
+            imageQuality: 100,
+          );
+
+          if (image != null) {
+            final ocrService = Provider.of<OCRService>(context, listen: false);
+            final ocrProvider =
+                Provider.of<OCRProvider>(context, listen: false);
+            final invoiceItemsProvider =
+                Provider.of<InvoiceItemsProvider>(context, listen: false);
+
+            await _processImage(
+                image.path, ocrService, ocrProvider, invoiceItemsProvider);
+          }
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao carregar a imagem.')),
+          );
+        }
       },
     );
   }
@@ -202,9 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
       "Ajuda",
       Icons.help_outline,
       Colors.redAccent,
-      () {
-        // TODO: Pensar em funcionalidades novas
-      },
+      _showHelpDialog,
     );
   }
 
