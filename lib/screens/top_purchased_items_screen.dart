@@ -6,3 +6,4 @@
 // usar uma lib pra fazer o grafico (no X vai ser as datas e no Y os preços
 // quando o usuario apertar em um item, abrir um dialog com as infos e o gráfico
 // vai corinthians!!
+

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/models/invoice.dart';
@@ -212,11 +211,11 @@ void showSaveListDialog(BuildContext context) {
 
                 if (success) {
                   Navigator.of(context).pop();
-
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Lista salva com sucesso!')),
                   );
-
+                  final email = userProvider.email;
+                  invoiceProvider.getInvoicesByEmail(email);
                   Navigator.of(context).pushReplacementNamed('/history');
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

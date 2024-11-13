@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
-import 'package:projeto_integrador_6/providers/user_provider.dart';
 import 'package:projeto_integrador_6/utils/form_dialogs.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
@@ -17,14 +16,12 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
-  late Future<bool> _futureInvoices;
+  late List<Invoice> _invoices;
 
   @override
   void initState() {
     super.initState();
-    final userEmail = Provider.of<UserProvider>(context, listen: false).email;
-    _futureInvoices = Provider.of<InvoiceProvider>(context, listen: false)
-        .getInvoicesByEmail(userEmail);
+    _invoices = Provider.of<InvoiceProvider>(context, listen: false).invoices;
   }
 
   @override
@@ -44,23 +41,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  FutureBuilder<bool>(
-                    future: _futureInvoices,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                            child: Text('Erro ao carregar o histórico.'));
-                      } else if (!snapshot.hasData ||
-                          snapshot.data == false ||
-                          invoiceProvider.invoices.isEmpty) {
-                        return const Center(
-                            child: Text('Nenhuma nota fiscal encontrada.'));
-                      }
-                      return _buildHistoryList(invoiceProvider);
-                    },
-                  ),
+                  if (_invoices.isEmpty)
+                    const Center(child: Text('Nenhuma nota fiscal encontrada.'))
+                  else
+                    _buildHistoryList(invoiceProvider),
                 ],
               ),
             ),
@@ -130,15 +114,12 @@ class HistoryScreenState extends State<HistoryScreen> {
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(Colors.orange),
           ),
-          child: Text(
+          child: const Text(
             'Lista dos Mais Comprados',
             style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Colors.white
-            ),
+                fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white),
           ),
-        )
+        ),
       ),
     );
   }

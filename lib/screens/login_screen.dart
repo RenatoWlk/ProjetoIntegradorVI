@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -230,31 +231,27 @@ class LoginScreenState extends State<LoginScreen> {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
 
-      // Armazene a referência do contexto antes da operação assíncrona
-      final currentContext = context;
-
       bool success = await MongoDatabase.login(email, password);
 
-      // Verifique se o contexto ainda está montado
-      if (!currentContext.mounted) return;
+      if (!context.mounted) return;
 
       if (success) {
-        // Se o contexto estiver montado, continue
-        Provider.of<UserProvider>(currentContext, listen: false).setEmail(email);
-        ScaffoldMessenger.of(currentContext).showSnackBar(
+        Provider.of<UserProvider>(context, listen: false).setEmail(email);
+        Provider.of<InvoiceProvider>(context, listen: false).getInvoicesByEmail(email);
+
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login realizado com sucesso!')),
         );
 
         await saveCredentials();
 
-        // Utilize Future.delayed com o contexto verificado
         Future.delayed(const Duration(seconds: 2), () {
-          if (currentContext.mounted) {
-            Navigator.of(currentContext).pushReplacementNamed('/home');
+          if (context.mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
           }
         });
       } else {
-        ScaffoldMessenger.of(currentContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erro: E-mail ou senha incorretos!')),
         );
       }
