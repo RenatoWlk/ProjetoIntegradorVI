@@ -20,9 +20,6 @@ class MongoDatabase {
         print(status);
       }
       var collection = db.collection(usersCollectionName);
-      if (kDebugMode) {
-        print(await collection.find().toList());
-      }
     } catch (e) {
       if (kDebugMode) {
         print("Erro ao tentar conectar ao banco: $e");
@@ -209,9 +206,6 @@ class MongoDatabase {
       }
     }
   }
-
-
-
 
   static Future<List<Invoice>> getInvoicesByEmail(String email) async {
     Db db = await Db.create(dbURL);

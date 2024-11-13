@@ -13,7 +13,6 @@ class ListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final invoiceItemsProvider = Provider.of<InvoiceItemsProvider>(context);
-    final formDialogs = FormDialogs();
 
     return Scaffold(
       endDrawer: _buildDrawer(context),
@@ -28,7 +27,7 @@ class ListScreen extends StatelessWidget {
                   const SizedBox(height: 100),
                   _buildHeader(),
                   const SizedBox(height: 30),
-                  _buildProductList(context, invoiceItemsProvider, formDialogs),
+                  _buildProductList(context, invoiceItemsProvider),
                 ],
               ),
             ),
@@ -38,7 +37,7 @@ class ListScreen extends StatelessWidget {
             child: Column(
               children: [
                 _buildListActionButtons(
-                    context, invoiceItemsProvider, formDialogs),
+                    context, invoiceItemsProvider),
                 const SizedBox(height: 20),
                 _buildActionButtons(context),
               ],
@@ -80,7 +79,7 @@ class ListScreen extends StatelessWidget {
   }
 
   Widget _buildProductList(BuildContext context,
-      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
+      InvoiceItemsProvider invoiceItemsProvider) {
     final products = invoiceItemsProvider.invoiceItems;
 
     return ListView.builder(
@@ -95,8 +94,8 @@ class ListScreen extends StatelessWidget {
             product.itemQuantity.toString(),
             product.itemPrice.toStringAsFixed(2),
             index,
-            invoiceItemsProvider,
-            formDialogs);
+            invoiceItemsProvider
+        );
       },
     );
   }
@@ -107,8 +106,7 @@ class ListScreen extends StatelessWidget {
       String quantity,
       String price,
       int index,
-      InvoiceItemsProvider invoiceItemsProvider,
-      FormDialogs formDialogs) {
+      InvoiceItemsProvider invoiceItemsProvider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Container(
@@ -124,7 +122,7 @@ class ListScreen extends StatelessWidget {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  formDialogs.editItemField(context, 'Editar Nome', name,
+                  editItemField(context, 'Editar Nome', name,
                       (newValue) {
                     invoiceItemsProvider.updateInvoiceItemName(index, newValue);
                   });
@@ -143,7 +141,7 @@ class ListScreen extends StatelessWidget {
                 // Edit quantity
                 InkWell(
                   onTap: () {
-                    formDialogs.editItemField(
+                    editItemField(
                         context, 'Editar Quantidade', quantity, (newValue) {
                       invoiceItemsProvider.updateInvoiceItemQuantity(
                           index, int.parse(newValue));
@@ -160,7 +158,7 @@ class ListScreen extends StatelessWidget {
                 // Edit price
                 InkWell(
                   onTap: () {
-                    formDialogs.editItemField(context, 'Editar Preço', price,
+                    editItemField(context, 'Editar Preço', price,
                         (newValue) {
                       invoiceItemsProvider.updateInvoiceItemPrice(
                           index, double.parse(newValue));
@@ -213,40 +211,36 @@ class ListScreen extends StatelessWidget {
       onHistoryTap: () {
         Navigator.of(context).pushReplacementNamed('/history');
       },
-      onEditDataTap: () {
-        // TODO: Edição de dados
-        Navigator.pop(context);
-      },
     );
   }
 
   Widget _buildListActionButtons(BuildContext context,
-      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
+      InvoiceItemsProvider invoiceItemsProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildDeleteAllItemsButton(context, formDialogs),
+        _buildDeleteAllItemsButton(context),
         const SizedBox(width: 20),
-        _buildAddItemButton(context, formDialogs),
+        _buildAddItemButton(context),
         const SizedBox(width: 20),
-        _buildSaveListButton(context, invoiceItemsProvider, formDialogs),
+        _buildSaveListButton(context, invoiceItemsProvider),
       ],
     );
   }
 
   Widget _buildDeleteAllItemsButton(
-      BuildContext context, FormDialogs formDialogs) {
+      BuildContext context) {
     return FloatingActionButton(
-      onPressed: () => formDialogs.showRemoveAllItemsDialog(context),
+      onPressed: () => showRemoveAllItemsDialog(context),
       backgroundColor: Colors.red,
       heroTag: 'remove_all_fab',
       child: const Icon(Icons.delete_forever_outlined),
     );
   }
 
-  Widget _buildAddItemButton(BuildContext context, FormDialogs formDialogs) {
+  Widget _buildAddItemButton(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () => formDialogs.showAddItemDialog(context),
+      onPressed: () => showAddItemDialog(context),
       backgroundColor: Colors.orange,
       heroTag: 'add_item_fab',
       child: const Icon(Icons.add),
@@ -254,11 +248,11 @@ class ListScreen extends StatelessWidget {
   }
 
   Widget _buildSaveListButton(BuildContext context,
-      InvoiceItemsProvider invoiceItemsProvider, FormDialogs formDialogs) {
+      InvoiceItemsProvider invoiceItemsProvider) {
     return FloatingActionButton(
       onPressed: () {
         if (invoiceItemsProvider.invoiceItems.isNotEmpty) {
-          formDialogs.showSaveListDialog(context);
+          showSaveListDialog(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sua lista está vazia!')),

@@ -8,7 +8,6 @@ class CustomDrawer extends StatelessWidget {
   final VoidCallback onNewListTap;
   final VoidCallback onScanTap;
   final VoidCallback onHistoryTap;
-  final VoidCallback onEditDataTap;
   final textColor = Colors.orange;
   final iconColor = Colors.orange;
 
@@ -17,7 +16,6 @@ class CustomDrawer extends StatelessWidget {
     required this.onNewListTap,
     required this.onScanTap,
     required this.onHistoryTap,
-    required this.onEditDataTap,
   }) : super(key: key);
 
   @override

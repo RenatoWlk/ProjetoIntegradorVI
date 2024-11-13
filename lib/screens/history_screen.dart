@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/providers/user_provider.dart';
+import 'package:projeto_integrador_6/utils/form_dialogs.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
@@ -100,11 +101,45 @@ class HistoryScreenState extends State<HistoryScreen> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: invoices.length,
+      itemCount: invoices.length + 1,
       itemBuilder: (context, index) {
-        final invoice = invoices[index];
-        return _buildHistoryItem(context, invoice, index);
+        if (index == 0) {
+          return _buildMostPurchasedItems();
+        } else {
+          final invoice = invoices[index - 1];
+          return _buildHistoryItem(context, invoice, index - 1);
+        }
       },
+    );
+  }
+
+  Widget _buildMostPurchasedItems() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.orange, width: 1),
+        ),
+        child: TextButton(
+          onPressed: () {
+            // TODO: LISTA MAIS COMPRADOS
+          },
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.orange),
+          ),
+          child: Text(
+            'Lista dos Mais Comprados',
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: Colors.white
+            ),
+          ),
+        )
+      ),
     );
   }
 
@@ -134,10 +169,10 @@ class HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.manage_history, size: 35),
+              icon: const Icon(Icons.info_outline, size: 35),
               iconSize: 35,
               onPressed: () {
-                _showInvoiceDetailsDialog(context, invoice);
+                showInvoiceDetailsDialog(context, invoice);
               },
             ),
           ],
@@ -169,74 +204,6 @@ class HistoryScreenState extends State<HistoryScreen> {
       },
       onHistoryTap: () {
         Navigator.pop(context);
-      },
-      onEditDataTap: () {
-        // TODO: Edição de dados
-        Navigator.pop(context);
-      },
-    );
-  }
-
-  void _showInvoiceDetailsDialog(BuildContext context, Invoice invoice) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Detalhes - ${invoice.invoiceTitle}'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Data: ${invoice.orderDate}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Total: R\$${invoice.totalPrice.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Itens da Lista:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 400,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: invoice.invoiceItems.length,
-                    itemBuilder: (context, index) {
-                      final item = invoice.invoiceItems[index];
-                      return ListTile(
-                        title: Text(item.itemName),
-                        subtitle: Text(
-                            'Quantidade: ${item.itemQuantity} | Preço: R\$${item.itemPrice.toStringAsFixed(2)}'),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Fechar'),
-            ),
-          ],
-        );
       },
     );
   }
