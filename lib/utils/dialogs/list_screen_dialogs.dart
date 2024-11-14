@@ -96,9 +96,9 @@ void showAddItemDialog(BuildContext context) {
           TextButton(
             onPressed: () {
               final name = nameController.text;
-              final price = double.tryParse(
-                      priceController.text.replaceAll(',', '.')) ??
-                  0.0;
+              final price =
+                  double.tryParse(priceController.text.replaceAll(',', '.')) ??
+                      0.0;
               final quantity = int.tryParse(quantityController.text);
 
               if (name.isNotEmpty &&
@@ -158,8 +158,7 @@ void showSaveListDialog(BuildContext context) {
       text: DateFormat('dd/MM/yyyy').format(DateTime.now()).toString());
   final invoiceItemsProvider =
       Provider.of<InvoiceItemsProvider>(context, listen: false);
-  final invoiceProvider =
-      Provider.of<InvoiceProvider>(context, listen: false);
+  final invoiceProvider = Provider.of<InvoiceProvider>(context, listen: false);
   final userProvider = Provider.of<UserProvider>(context, listen: false);
 
   showDialog(
@@ -176,8 +175,7 @@ void showSaveListDialog(BuildContext context) {
             ),
             TextField(
               controller: dateController,
-              decoration:
-                  const InputDecoration(labelText: 'Data (DD/MM/AAAA)'),
+              decoration: const InputDecoration(labelText: 'Data (DD/MM/AAAA)'),
               keyboardType: TextInputType.datetime,
               inputFormatters: [MaskTextInputFormatter(mask: '##/##/####')],
             ),
@@ -231,117 +229,6 @@ void showSaveListDialog(BuildContext context) {
               }
             },
             child: const Text('Salvar'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-void showInvoiceDetailsDialog(BuildContext context, Invoice invoice) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Detalhes - ${invoice.invoiceTitle}'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Data: ${invoice.orderDate}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Total: R\$${invoice.totalPrice.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Itens da Lista:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 400,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: invoice.invoiceItems.length,
-                  itemBuilder: (context, index) {
-                    final item = invoice.invoiceItems[index];
-                    return ListTile(
-                      title: Text(item.itemName),
-                      subtitle: Text(
-                          'Quantidade: ${item.itemQuantity} | Preço: R\$${item.itemPrice.toStringAsFixed(2)}'),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Fechar'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-void showHelpDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Ajuda - Como usar o app'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('1. Escanear Nota Fiscal',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Use a câmera para escanear sua nota fiscal diretamente.'),
-              SizedBox(height: 10),
-              Text('2. Escanear PDF de NFC-e',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Carregue um arquivo PDF de Nota Fiscal Eletrônica.'),
-              SizedBox(height: 10),
-              Text('3. Carregar Imagem de NFC-e',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(
-                  'Selecione uma imagem da galeria contendo sua nota fiscal.'),
-              SizedBox(height: 10),
-              Text('4. Lista de Compras',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Visualize e gerencie seus itens escaneados.'),
-              SizedBox(height: 10),
-              Text('5. Histórico',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Acesse suas notas fiscais anteriores.'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Fechar'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
         ],
       );

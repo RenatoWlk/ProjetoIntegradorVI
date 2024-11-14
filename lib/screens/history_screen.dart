@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
-import 'package:projeto_integrador_6/utils/form_dialogs.dart';
+import 'package:projeto_integrador_6/utils/dialogs/history_screen_dialogs.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
 import 'package:projeto_integrador_6/widgets/custom_action_buttons.dart';
@@ -109,7 +109,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         ),
         child: TextButton(
           onPressed: () {
-            // TODO: LISTA MAIS COMPRADOS
+            Navigator.of(context).pushReplacementNamed('/top_purchased_items');
           },
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(Colors.orange),

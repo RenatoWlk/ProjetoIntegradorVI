@@ -12,11 +12,11 @@ class CustomDrawer extends StatelessWidget {
   final iconColor = Colors.orange;
 
   const CustomDrawer({
-    Key? key,
+    super.key,
     required this.onNewListTap,
     required this.onScanTap,
     required this.onHistoryTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

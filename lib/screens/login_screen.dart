@@ -237,7 +237,8 @@ class LoginScreenState extends State<LoginScreen> {
 
       if (success) {
         Provider.of<UserProvider>(context, listen: false).setEmail(email);
-        Provider.of<InvoiceProvider>(context, listen: false).getInvoicesByEmail(email);
+        Provider.of<InvoiceProvider>(context, listen: false)
+            .getInvoicesByEmail(email);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login realizado com sucesso!')),
@@ -257,5 +258,4 @@ class LoginScreenState extends State<LoginScreen> {
       }
     }
   }
-
 }

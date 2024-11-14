@@ -8,7 +8,8 @@ import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
 
-Future<void> pickAndProccessPdf(BuildContext context, OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) async {
+Future<void> pickAndProccessPdf(BuildContext context, OCRProvider ocrProvider,
+    InvoiceItemsProvider invoiceItemsProvider) async {
   FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['pdf'],
@@ -16,7 +17,7 @@ Future<void> pickAndProccessPdf(BuildContext context, OCRProvider ocrProvider, I
 
   if (result != null && result.files.single.path != null) {
     String text = await extractTextFromPdf(result.files.single.path!);
-    if(!context.mounted) return;
+    if (!context.mounted) return;
     await processPdfContent(context, text, ocrProvider, invoiceItemsProvider);
   }
 }
@@ -24,7 +25,7 @@ Future<void> pickAndProccessPdf(BuildContext context, OCRProvider ocrProvider, I
 Future<String> extractTextFromPdf(String path) async {
   final File file = File(path);
   final PdfDocument document =
-  PdfDocument(inputBytes: await file.readAsBytes());
+      PdfDocument(inputBytes: await file.readAsBytes());
   String text = '';
 
   for (int i = 0; i < document.pages.count; i++) {
@@ -36,14 +37,14 @@ Future<String> extractTextFromPdf(String path) async {
   return text;
 }
 
-Future<void> processPdfContent(BuildContext context, String text, OCRProvider ocrProvider,
-    InvoiceItemsProvider invoiceItemsProvider) async {
+Future<void> processPdfContent(BuildContext context, String text,
+    OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) async {
   bool isInvoice = InvoiceItemsUtil.isInvoice(text);
 
   if (isInvoice) {
     final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
     List<InvoiceItem> items =
-    invoiceItemsUtil.extractInvoiceItemsFromText(text);
+        invoiceItemsUtil.extractInvoiceItemsFromText(text);
     invoiceItemsProvider.addInvoiceItems(items);
     ocrProvider
         .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));
@@ -61,8 +62,7 @@ Future<void> processPdfContent(BuildContext context, String text, OCRProvider oc
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content:
-          Text('Não foi possível identificar uma nota fiscal no PDF')),
+          content: Text('Não foi possível identificar uma nota fiscal no PDF')),
     );
   }
 }

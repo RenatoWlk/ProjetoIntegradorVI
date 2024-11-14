@@ -19,7 +19,6 @@ class MongoDatabase {
       if (kDebugMode) {
         print(status);
       }
-      var collection = db.collection(usersCollectionName);
     } catch (e) {
       if (kDebugMode) {
         print("Erro ao tentar conectar ao banco: $e");
@@ -179,7 +178,7 @@ class MongoDatabase {
       // Atualiza a senha, se estiver nos dados
       if (updatedData.containsKey('password')) {
         updatedData['password'] =
-        await encryption.hashPassword(updatedData['password']);
+            await encryption.hashPassword(updatedData['password']);
       }
 
       // Realiza a atualização dos dados no banco

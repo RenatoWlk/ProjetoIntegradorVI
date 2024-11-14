@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
 
 class EditDataScreen extends StatefulWidget {
-
   const EditDataScreen({super.key});
 
   @override
@@ -59,8 +58,6 @@ class _EditDataScreenState extends State<EditDataScreen> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

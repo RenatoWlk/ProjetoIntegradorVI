@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomDrawerButton extends StatelessWidget {
-  const CustomDrawerButton({Key? key}) : super(key: key);
+  const CustomDrawerButton({super.key});
 
   @override
   Widget build(BuildContext context) {

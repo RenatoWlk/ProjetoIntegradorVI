@@ -7,7 +7,7 @@ import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
-import 'package:projeto_integrador_6/utils/form_dialogs.dart';
+import 'package:projeto_integrador_6/utils/dialogs/home_screen_dialogs.dart';
 import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
 import 'package:projeto_integrador_6/utils/pdf_util.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
@@ -94,7 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildScanButton(
                 context, ocrService, ocrProvider, invoiceItemsProvider),
             _buildPdfButton(context, ocrProvider, invoiceItemsProvider),
-            _buildUploadImageButton(context, ocrService, ocrProvider, invoiceItemsProvider),
+            _buildUploadImageButton(
+                context, ocrService, ocrProvider, invoiceItemsProvider),
             _buildHelpButton(),
           ],
         ),
@@ -180,7 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPdfButton(BuildContext context, OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) {
+  Widget _buildPdfButton(BuildContext context, OCRProvider ocrProvider,
+      InvoiceItemsProvider invoiceItemsProvider) {
     return _buildButton(
       "Escanear PDF\nde NFC-e",
       Icons.picture_as_pdf,
@@ -198,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildUploadImageButton(BuildContext context, OCRService ocrService, OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) {
+  Widget _buildUploadImageButton(BuildContext context, OCRService ocrService,
+      OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) {
     return _buildButton(
       "Carregar Imagem\nde NFC-e",
       Icons.image_search_outlined,
@@ -212,8 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           if (!context.mounted) return;
           if (image != null) {
-            await _processImage(
-                context, image.path, ocrService, ocrProvider, invoiceItemsProvider);
+            await _processImage(context, image.path, ocrService, ocrProvider,
+                invoiceItemsProvider);
           }
         } catch (e) {
           if (!context.mounted) return;
@@ -226,14 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHelpButton() {
-    return _buildButton(
-      "Ajuda",
-      Icons.help_outline,
-      Colors.redAccent,
-      () {
-        showHelpDialog(context);
-      }
-    );
+    return _buildButton("Ajuda", Icons.help_outline, Colors.redAccent, () {
+      showHelpDialog(context);
+    });
   }
 
   Widget _buildActionButtons(BuildContext context) {
@@ -275,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isInvoice) {
         final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
         List<InvoiceItem> items =
-        invoiceItemsUtil.extractInvoiceItemsFromText(text);
+            invoiceItemsUtil.extractInvoiceItemsFromText(text);
         invoiceItemsProvider.addInvoiceItems(items);
         ocrProvider
             .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));

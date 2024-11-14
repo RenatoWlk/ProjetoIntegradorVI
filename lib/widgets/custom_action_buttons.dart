@@ -9,14 +9,14 @@ class ActionButtons extends StatelessWidget {
   final Color historyButtonColor;
 
   const ActionButtons({
-    Key? key,
+    super.key,
     required this.onListPressed,
     required this.onScanPressed,
     required this.onHistoryPressed,
     this.listButtonColor = Colors.white,
     this.scanButtonColor = Colors.white,
     this.historyButtonColor = Colors.white,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

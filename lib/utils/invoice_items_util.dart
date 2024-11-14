@@ -1,11 +1,38 @@
+import 'package:string_similarity/string_similarity.dart';
+
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 
 class InvoiceItemsUtil {
   static bool isInvoice(String ocrText) {
-    final RegExp regex = RegExp(
-        r'nfc-e|nota fiscal|cupom fiscal|cupon fiscal|cupon fiscol|cupom fiscol|CUPOM EISCAL',
-        caseSensitive: false);
-    return regex.hasMatch(ocrText);
+    final List<String> keywords = [
+      'nf-e'
+          'nfc-e',
+      'nota fiscal',
+      'cupom fiscal',
+      'cupom fiscal eletronico'
+    ];
+
+    bool hasSimilarKeyword(
+        String text, List<String> keywords, double threshold) {
+      for (var keyword in keywords) {
+        double similarity = StringSimilarity.compareTwoStrings(
+          text.toLowerCase(),
+          keyword.toLowerCase(),
+        );
+        if (similarity > threshold) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    for (var line in ocrText.split('\n')) {
+      if (hasSimilarKeyword(line, keywords, 0.6)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   List<InvoiceItem> extractInvoiceItemsFromText(String ocrText) {
@@ -122,11 +149,13 @@ class InvoiceItemsUtil {
       'cartao',
       'contribuinte',
       'CPF',
-      'CNPJ'
+      'CNPJ',
     ];
 
     for (var word in unwantedWords) {
-      if (RegExp(r'\b' + word + r'\b', caseSensitive: false).hasMatch(name)) {
+      double similarity = StringSimilarity.compareTwoStrings(
+          name.toLowerCase(), word.toLowerCase());
+      if (similarity > 0.6) {
         return null;
       }
     }
@@ -160,40 +189,61 @@ class InvoiceItemsUtil {
   }
 
   String improveOCRFormatting(String ocrText) {
-    final RegExp regexNfc = RegExp(
-        r'nfc-e|nota fiscal|cupom fiscal|cupon fiscal|cupon fiscol|cupom fiscol|CUPOM EISCAL',
-        caseSensitive: false);
-    final Match? match1 = regexNfc.firstMatch(ocrText);
+    final List<String> keywordsNfc = [
+      'nf-e'
+          'nfc-e',
+      'nota fiscal',
+      'cupom fiscal',
+      'cupom fiscal eletrônico'
+    ];
 
-    // corta tudo que ta antes da frase cupom fiscal
-    if (match1 != null) {
-      ocrText = ocrText.substring(match1.end);
+    final List<String> keywordsTotal = ['total', 'totai', 't0tal', 't0tai'];
+
+    for (var line in ocrText.split('\n')) {
+      if (findSimilarKeyword(line, keywordsNfc, 0.6) != null) {
+        ocrText = ocrText.substring(ocrText.indexOf(line) + line.length).trim();
+        break;
+      }
     }
 
-    final RegExp regexTotal =
-        RegExp(r'total|totai|t0tal|t0tai', caseSensitive: false);
-    final Iterable<Match> totalMatches = regexTotal.allMatches(ocrText);
+    List<int> totalPositions = [];
+    for (var match in keywordsTotal) {
+      int index = ocrText.toLowerCase().indexOf(match.toLowerCase());
+      while (index != -1) {
+        totalPositions.add(index);
+        index = ocrText.toLowerCase().indexOf(match.toLowerCase(), index + 1);
+      }
+    }
 
-    // vê se tem mais de 1 match com a palavra total
-    if (totalMatches.length > 1) {
-      final Match firstTotalMatch = totalMatches.first;
-      final Match lastTotalMatch = totalMatches.last;
+    if (totalPositions.length > 1) {
+      int firstTotalIndex = totalPositions.first;
+      int lastTotalIndex = totalPositions.last;
 
-      // corta tudo antes do primeiro total
-      String ocrTextAfterFirstTotal = ocrText.substring(firstTotalMatch.end);
+      String ocrTextAfterFirstTotal = ocrText.substring(firstTotalIndex);
+      String ocrTextBeforeLastTotal = ocrText.substring(0, lastTotalIndex);
 
-      // corta tudo depois do último total
-      String ocrTextBeforeLastTotal =
-          ocrText.substring(0, lastTotalMatch.start);
-
-      // retorna o texto entre o primeiro e o último total
       ocrText = ocrTextAfterFirstTotal.substring(
-          0,
-          ocrTextAfterFirstTotal.length -
-              (ocrText.length - ocrTextBeforeLastTotal.length));
+        0,
+        ocrTextAfterFirstTotal.length -
+            (ocrText.length - ocrTextBeforeLastTotal.length),
+      );
     }
 
-    return ocrText;
+    return ocrText.trim();
+  }
+
+  String? findSimilarKeyword(
+      String text, List<String> keywords, double threshold) {
+    for (var keyword in keywords) {
+      double similarity = StringSimilarity.compareTwoStrings(
+        text.toLowerCase(),
+        keyword.toLowerCase(),
+      );
+      if (similarity > threshold) {
+        return keyword;
+      }
+    }
+    return null;
   }
 
   String invoiceItemsToString(List<InvoiceItem> itens) {
