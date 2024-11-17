@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
@@ -140,35 +142,23 @@ class _HomeScreenState extends State<HomeScreen> {
       Colors.orange,
       () async {
         try {
-          List<String> pictures =
-              await CunningDocumentScanner.getPictures() ?? [];
-          if (pictures.isNotEmpty) {
-            String text = await ocrService.extractTextFromImage(pictures.first);
-            bool isInvoice = InvoiceItemsUtil.isInvoice(text);
-            if (isInvoice) {
-              final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
-              List<InvoiceItem> items =
-                  invoiceItemsUtil.extractInvoiceItemsFromText(text);
-              invoiceItemsProvider.addInvoiceItems(items);
-              ocrProvider.updateExtractedText(
-                  invoiceItemsUtil.invoiceItemsToString(items));
-              if (!context.mounted) return;
+          bool? scannerChoosed = await showCameraOrScannerDialog(context);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Escaneado com sucesso!')),
-              );
-              Future.delayed(const Duration(seconds: 1), () {
-                if (context.mounted) {
-                  Navigator.of(context).pushReplacementNamed('/list');
-                }
-              });
-            } else {
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text(
-                        'Não foi possível identificar uma nota fiscal :(')),
-              );
+          if (scannerChoosed == true) {
+            List<String> pictures =
+                await CunningDocumentScanner.getPictures() ?? [];
+            if (!context.mounted) return;
+            if (pictures.isNotEmpty) {
+              _processImage(context, pictures.first, ocrService, ocrProvider,
+                  invoiceItemsProvider);
+            }
+          }
+          else if (scannerChoosed == false) {
+            final XFile? pickedImage = await _imagePicker.pickImage(source: ImageSource.camera);
+            if (!context.mounted) return;
+            if (pickedImage != null) {
+              _processImage(context, pickedImage.path, ocrService, ocrProvider,
+                  invoiceItemsProvider);
             }
           }
         } catch (e) {
@@ -280,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Imagem processada com sucesso!')),
+          const SnackBar(content: Text('Escaneado com sucesso!')),
         );
         Future.delayed(const Duration(seconds: 1), () {
           if (context.mounted) {
@@ -292,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text(
-                  'Não foi possível identificar uma nota fiscal na imagem')),
+                  'Não foi possível identificar uma nota fiscal na imagem :(')),
         );
       }
     } catch (e) {
