@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
@@ -152,9 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
               _processImage(context, pictures.first, ocrService, ocrProvider,
                   invoiceItemsProvider);
             }
-          }
-          else if (scannerChoosed == false) {
-            final XFile? pickedImage = await _imagePicker.pickImage(source: ImageSource.camera);
+          } else if (scannerChoosed == false) {
+            final XFile? pickedImage =
+                await _imagePicker.pickImage(source: ImageSource.camera);
             if (!context.mounted) return;
             if (pickedImage != null) {
               _processImage(context, pickedImage.path, ocrService, ocrProvider,

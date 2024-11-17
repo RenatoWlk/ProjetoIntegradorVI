@@ -18,7 +18,8 @@ Future<bool?> showCameraOrScannerDialog(BuildContext context) async {
             children: [
               const SizedBox(height: 20),
               ListTile(
-                leading: Icon(Icons.document_scanner, color: Colors.orange, size: 50),
+                leading: Icon(Icons.document_scanner,
+                    color: Colors.orange, size: 50),
                 title: Text(
                   'Utilizar o Scanner de Documentos',
                   style: TextStyle(
@@ -90,37 +91,35 @@ void showHelpDialog(BuildContext context) {
             children: [
               Text('1. Escanear Nota Fiscal',
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Use o escaneador de documentos ou a câmera para escanear sua nota fiscal diretamente.',
+              Text(
+                  'Use o escaneador de documentos ou a câmera para escanear sua nota fiscal diretamente.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               SizedBox(height: 20),
-
               Text('2. Escanear PDF de Nota Fiscal',
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Carregue um arquivo PDF de Nota Fiscal para escanear os itens.',
+              Text(
+                  'Carregue um arquivo PDF de Nota Fiscal para escanear os itens.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               SizedBox(height: 20),
-
               Text('3. Carregar Imagem de Nota Fiscal',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               Text('Selecione uma imagem da galeria contendo sua nota fiscal.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               SizedBox(height: 20),
-
               Text('4. Lista de Itens',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               Text('Visualize, gerencie e salve seus itens escaneados.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               SizedBox(height: 20),
-
               Text('5. Histórico',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               Text('Acesse suas notas fiscais anteriores.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
               SizedBox(height: 20),
-
               Text('6. Itens Mais Comprados',
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Visualize quantas vezes um item foi comprado e compare os preços por data.',
+              Text(
+                  'Visualize quantas vezes um item foi comprado e compare os preços por data.',
                   style: TextStyle(fontWeight: FontWeight.w500)),
             ],
           ),

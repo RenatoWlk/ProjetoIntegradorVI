@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:string_similarity/string_similarity.dart';
 
@@ -134,7 +133,6 @@ class TopPurchasedItemsScreen extends StatelessWidget {
   Map<String, ItemData> processInvoices(BuildContext context) {
     List<Invoice> invoices = Provider.of<InvoiceProvider>(context).invoices;
     Map<String, ItemData> itemMap = {};
-    DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     double similarity = 0.0;
     String? similarKey;
 
@@ -153,19 +151,18 @@ class TopPurchasedItemsScreen extends StatelessWidget {
           itemMap[item.itemName] = ItemData(name: item.itemName);
         } else {
           itemMap[similarKey]!.totalQuantity += item.itemQuantity;
-          DateTime parsedDate = dateFormat.parse(invoice.orderDate);
-          itemMap[similarKey]!.dates.add(parsedDate);
+          itemMap[similarKey]!.dates.add(invoice.orderDate);
           itemMap[similarKey]!.prices.add(item.itemPrice);
           continue;
         }
 
         itemMap[item.itemName]!.totalQuantity += item.itemQuantity;
-        DateTime parsedDate = dateFormat.parse(invoice.orderDate);
-        itemMap[item.itemName]!.dates.add(parsedDate);
+        itemMap[item.itemName]!.dates.add(invoice.orderDate);
         itemMap[item.itemName]!.prices.add(item.itemPrice);
       }
     }
 
+    itemMap.removeWhere((key, itemData) => itemData.totalQuantity <= 1);
     return itemMap;
   }
 }
