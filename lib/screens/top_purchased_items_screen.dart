@@ -14,9 +14,8 @@ class TopPurchasedItemsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final itemMap = processInvoices(context);
-
-    var sortedItems = itemMap.values.toList()
+    final items = processInvoices(context);
+    var sortedItems = items
       ..sort((a, b) => b.totalQuantity.compareTo(a.totalQuantity));
 
     return Scaffold(
@@ -36,6 +35,10 @@ class TopPurchasedItemsScreen extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
+            child: _buildGoBackButton(context),
           ),
         ],
       ),
@@ -130,39 +133,61 @@ class TopPurchasedItemsScreen extends StatelessWidget {
     );
   }
 
-  Map<String, ItemData> processInvoices(BuildContext context) {
+  Widget _buildGoBackButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        Navigator.of(context).pushReplacementNamed('/history');
+      },
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll<Color>(Colors.orange),
+        padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(10.0)),
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: BorderSide(color: Colors.orange),
+          ),
+        ),
+      ),
+      child: Text(
+        'Voltar para o Histórico',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  List<ItemData> processInvoices(BuildContext context) {
     List<Invoice> invoices = Provider.of<InvoiceProvider>(context).invoices;
-    Map<String, ItemData> itemMap = {};
-    double similarity = 0.0;
-    String? similarKey;
+    List<ItemData> processedItems = [];
 
     for (var invoice in invoices) {
       for (var item in invoice.invoiceItems) {
-        similarKey = null;
-        for (var key in itemMap.keys) {
-          similarity = StringSimilarity.compareTwoStrings(key, item.itemName);
-          if (similarity > 0.7) {
-            similarKey = key;
-            break;
+        for (int i = 0; i < processedItems.length; i++) {
+          double similarity = StringSimilarity.compareTwoStrings(
+              item.itemName, processedItems[i].name);
+          if (similarity >= 0.5) {
+            processedItems[i].totalQuantity += item.itemQuantity;
+            if (!processedItems[i].dates.contains(invoice.orderDate)) {
+              processedItems[i].dates.add(invoice.orderDate);
+            }
+            processedItems[i].prices.add(item.itemPrice / item.itemQuantity);
+          } else {
+            double unitPrice = item.itemPrice / item.itemQuantity;
+            ItemData newProcessedItem = ItemData(
+                name: item.itemName,
+                totalQuantity: item.itemQuantity,
+                dates: [invoice.orderDate],
+                prices: [unitPrice]);
+            processedItems.add(newProcessedItem);
           }
         }
-
-        if (similarKey == null) {
-          itemMap[item.itemName] = ItemData(name: item.itemName);
-        } else {
-          itemMap[similarKey]!.totalQuantity += item.itemQuantity;
-          itemMap[similarKey]!.dates.add(invoice.orderDate);
-          itemMap[similarKey]!.prices.add(item.itemPrice);
-          continue;
-        }
-
-        itemMap[item.itemName]!.totalQuantity += item.itemQuantity;
-        itemMap[item.itemName]!.dates.add(invoice.orderDate);
-        itemMap[item.itemName]!.prices.add(item.itemPrice);
       }
     }
 
-    itemMap.removeWhere((key, itemData) => itemData.totalQuantity <= 1);
-    return itemMap;
+    processedItems.removeWhere((item) => item.dates.length <= 1);
+    return processedItems;
   }
 }

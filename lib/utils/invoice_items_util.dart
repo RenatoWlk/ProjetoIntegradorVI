@@ -4,30 +4,41 @@ import 'package:projeto_integrador_6/models/invoice_item.dart';
 
 class InvoiceItemsUtil {
   static bool isInvoice(String ocrText) {
+    final RegExp regex = RegExp(
+        r'nfc-e|nota fiscal|cupom fiscal|cupom fiscal eletronico',
+        caseSensitive: false);
+    if (regex.hasMatch(ocrText)) {
+      return true;
+    }
+
     final List<String> keywords = [
-      'nf-e'
-          'nfc-e',
+      'nf-e',
+      'nfc-e',
       'nota fiscal',
       'cupom fiscal',
-      'cupom fiscal eletronico'
+      'cupom fiscal eletronico',
     ];
 
     bool hasSimilarKeyword(
         String text, List<String> keywords, double threshold) {
-      for (var keyword in keywords) {
-        double similarity = StringSimilarity.compareTwoStrings(
-          text.toLowerCase(),
-          keyword.toLowerCase(),
-        );
-        if (similarity > threshold) {
-          return true;
+      List<String> words = text.split(RegExp(r'\s+'));
+
+      for (var word in words) {
+        for (var keyword in keywords) {
+          double similarity = StringSimilarity.compareTwoStrings(
+            word.toLowerCase(),
+            keyword.toLowerCase(),
+          );
+          if (similarity > threshold) {
+            return true;
+          }
         }
       }
       return false;
     }
 
     for (var line in ocrText.split('\n')) {
-      if (hasSimilarKeyword(line, keywords, 0.6)) {
+      if (hasSimilarKeyword(line, keywords, 0.4)) {
         return true;
       }
     }
@@ -150,12 +161,17 @@ class InvoiceItemsUtil {
       'contribuinte',
       'CPF',
       'CNPJ',
+      'valor',
     ];
 
     for (var word in unwantedWords) {
+      if (RegExp(r'\b' + word + r'\b', caseSensitive: false).hasMatch(name)) {
+        return null;
+      }
+
       double similarity = StringSimilarity.compareTwoStrings(
           name.toLowerCase(), word.toLowerCase());
-      if (similarity > 0.6) {
+      if (similarity >= 0.4) {
         return null;
       }
     }

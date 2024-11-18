@@ -42,7 +42,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                   _buildHeader(),
                   const SizedBox(height: 30),
                   if (_invoices.isEmpty)
-                    const Center(child: Text('Nenhuma nota fiscal encontrada.'))
+                    const Center(child: Text('Nenhuma lista encontrada.'))
                   else
                     _buildHistoryList(invoiceProvider),
                 ],
@@ -127,7 +127,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget _buildHistoryItem(BuildContext context, Invoice invoice, int index) {
     final invoiceTitle = invoice.invoiceTitle;
     final orderDate = invoice.orderDate;
-    final totalPrice = invoice.totalPrice.toString();
+    final totalPrice = invoice.totalPrice.toStringAsFixed(2);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),

@@ -6,10 +6,7 @@ import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/user_provider.dart';
-
 import 'package:projeto_integrador_6/screens/login_screen.dart';
-// import 'package:projeto_integrador_6/screens/home_screen.dart';
-
 import 'package:projeto_integrador_6/services/database/database.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/routes/app_routes.dart';
@@ -48,10 +45,9 @@ class App extends StatelessWidget {
         title: 'ANDRÉ MENDELECK LTDA.',
         theme: ThemeData(
           fontFamily: "Space Grotesk",
-          primarySwatch: Colors.grey,
+          primarySwatch: Colors.orange,
         ),
         home: const LoginScreen(),
-        //home: const HomeScreen(),
         routes: AppRoutes.define(),
         debugShowCheckedModeBanner: false,
       ),
