@@ -86,7 +86,7 @@ class ItemDetailsDialogState extends State<ItemDetailsDialog> {
   LineChartData _mainData() {
     final maxPrice = widget.prices.reduce((a, b) => a > b ? a : b);
     final yInterval = _getYInterval(maxPrice);
-    final maxY = (maxPrice + (maxPrice * 0.5)).toInt().toDouble();
+    final maxY = (maxPrice + ((maxPrice * 0.5) + 1)).toInt().toDouble();
 
     List<FlSpot> spots = widget.dates.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), widget.prices[entry.key]);
@@ -98,7 +98,7 @@ class ItemDetailsDialogState extends State<ItemDetailsDialog> {
   LineChartData _avgData() {
     final maxPrice = widget.prices.reduce((a, b) => a > b ? a : b);
     final yInterval = _getYInterval(maxPrice);
-    final maxY = (maxPrice + (maxPrice * 0.5)).toInt().toDouble();
+    final maxY = (maxPrice + ((maxPrice * 0.5) + 1)).toInt().toDouble();
 
     final avgPrice =
         widget.prices.reduce((a, b) => a + b) / widget.prices.length;

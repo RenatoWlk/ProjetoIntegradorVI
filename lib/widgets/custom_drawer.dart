@@ -83,6 +83,19 @@ class CustomDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 40.0),
 
+              // ITENS MAIS COMPRADOS
+              ListTile(
+                iconColor: iconColor,
+                textColor: textColor,
+                leading: const Icon(Icons.query_stats_outlined),
+                title: const Text('ITENS MAIS COMPRADOS',
+                    style: TextStyle(fontWeight: FontWeight.w700)),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/top_purchased_items');
+                },
+              ),
+              const SizedBox(height: 40.0),
+
               // EDITAR DADOS
               ListTile(
                 iconColor: iconColor,

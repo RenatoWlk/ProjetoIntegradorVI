@@ -165,6 +165,18 @@ class TopPurchasedItemsScreen extends StatelessWidget {
 
     for (var invoice in invoices) {
       for (var item in invoice.invoiceItems) {
+        if (processedItems.isEmpty) {
+          double unitPrice = item.itemPrice / item.itemQuantity;
+          ItemData newProcessedItem = ItemData(
+              name: item.itemName,
+              totalQuantity: item.itemQuantity,
+              dates: [invoice.orderDate],
+              prices: [unitPrice]);
+          processedItems.add(newProcessedItem);
+          continue;
+        }
+
+        bool itemMatched = false;
         for (int i = 0; i < processedItems.length; i++) {
           double similarity = StringSimilarity.compareTwoStrings(
               item.itemName, processedItems[i].name);
@@ -174,15 +186,19 @@ class TopPurchasedItemsScreen extends StatelessWidget {
               processedItems[i].dates.add(invoice.orderDate);
             }
             processedItems[i].prices.add(item.itemPrice / item.itemQuantity);
-          } else {
-            double unitPrice = item.itemPrice / item.itemQuantity;
-            ItemData newProcessedItem = ItemData(
-                name: item.itemName,
-                totalQuantity: item.itemQuantity,
-                dates: [invoice.orderDate],
-                prices: [unitPrice]);
-            processedItems.add(newProcessedItem);
+            itemMatched = true;
+            break;
           }
+        }
+
+        if (!itemMatched) {
+          double unitPrice = item.itemPrice / item.itemQuantity;
+          ItemData newProcessedItem = ItemData(
+              name: item.itemName,
+              totalQuantity: item.itemQuantity,
+              dates: [invoice.orderDate],
+              prices: [unitPrice]);
+          processedItems.add(newProcessedItem);
         }
       }
     }
