@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
+import 'package:projeto_integrador_6/providers/theme_provider.dart';
 import 'package:projeto_integrador_6/providers/user_provider.dart';
 import 'package:projeto_integrador_6/screens/login_screen.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
@@ -40,16 +41,28 @@ class App extends StatelessWidget {
         ChangeNotifierProvider<UserProvider>(
           create: (_) => UserProvider(),
         ),
-      ],
-      child: MaterialApp(
-        title: 'ANDRÉ MENDELECK LTDA.',
-        theme: ThemeData(
-          fontFamily: "Space Grotesk",
-          primarySwatch: Colors.orange,
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (_) => ThemeProvider(),
         ),
-        home: const LoginScreen(),
-        routes: AppRoutes.define(),
-        debugShowCheckedModeBanner: false,
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'ANDRÉ MENDELECK LTDA.',
+            theme: ThemeData(
+              fontFamily: "Space Grotesk",
+              primarySwatch: Colors.orange,
+            ),
+            darkTheme: ThemeData(
+              fontFamily: "Space Grotesk",
+              brightness: Brightness.dark,
+            ),
+            themeMode: themeProvider.themeMode,
+            home: const LoginScreen(),
+            routes: AppRoutes.define(),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }
