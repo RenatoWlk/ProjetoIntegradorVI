@@ -51,6 +51,7 @@ class App extends StatelessWidget {
             title: 'ANDRÉ MENDELECK LTDA.',
             theme: ThemeData(
               fontFamily: "Space Grotesk",
+              brightness: Brightness.light,
               primarySwatch: Colors.orange,
             ),
             darkTheme: ThemeData(

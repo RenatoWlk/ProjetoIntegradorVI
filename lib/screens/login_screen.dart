@@ -67,7 +67,6 @@ class LoginScreenState extends State<LoginScreen> {
                     Icon(
                       Icons.shopping_cart_outlined,
                       size: 110,
-                      color: Colors.black,
                     ),
 
                     // TEXTO NOME DO APP

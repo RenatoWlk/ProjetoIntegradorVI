@@ -23,7 +23,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Drawer(
         width: MediaQuery.of(context).size.width * 0.8, // cobre 80% da tela

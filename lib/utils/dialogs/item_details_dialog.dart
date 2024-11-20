@@ -47,11 +47,14 @@ class ItemDetailsDialogState extends State<ItemDetailsDialog> {
               child: Text(
                 'Ver Média',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[400]!
+                      : Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             AspectRatio(
               aspectRatio: 1,
               child: Padding(
@@ -83,34 +86,64 @@ class ItemDetailsDialogState extends State<ItemDetailsDialog> {
     return 100.0;
   }
 
-  LineChartData _mainData() {
-    final maxPrice = widget.prices.reduce((a, b) => a > b ? a : b);
-    final yInterval = _getYInterval(maxPrice);
-    final maxY = (maxPrice + ((maxPrice * 0.5) + 1)).toInt().toDouble();
+  double _getMaxY(double maxPrice) {
+    double maxY = (maxPrice + ((maxPrice * 0.5) + 1)).toInt().toDouble();
+    if (maxY % 2 == 0) return maxY;
+    return maxY - 1;
+  }
 
+  DateTime _convertDateToDateTime(String date) {
+    List<String> parts = date.split('/');
+    int day = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int year = int.parse(parts[2]);
+    return DateTime(year, month, day);
+  }
+
+  void _sortDates() {
+    List<MapEntry<int, String>> sortedEntries =
+        widget.dates.asMap().entries.toList();
+    sortedEntries.sort((a, b) => _convertDateToDateTime(a.value)
+        .compareTo(_convertDateToDateTime(b.value)));
+
+    List<double> sortedPrices =
+        sortedEntries.map((entry) => widget.prices[entry.key]).toList();
+    List<String> sortedDates =
+        sortedEntries.map((entry) => entry.value).toList();
+
+    widget.dates.clear();
+    widget.dates.addAll(sortedDates);
+    widget.prices.clear();
+    widget.prices.addAll(sortedPrices);
+  }
+
+  LineChartData _mainData() {
+    _sortDates();
     List<FlSpot> spots = widget.dates.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), widget.prices[entry.key]);
     }).toList();
 
-    return _buildChartData(spots, yInterval, maxY);
+    return _buildChartData(spots);
   }
 
   LineChartData _avgData() {
-    final maxPrice = widget.prices.reduce((a, b) => a > b ? a : b);
-    final yInterval = _getYInterval(maxPrice);
-    final maxY = (maxPrice + ((maxPrice * 0.5) + 1)).toInt().toDouble();
-
-    final avgPrice =
-        widget.prices.reduce((a, b) => a + b) / widget.prices.length;
+    _sortDates();
+    final avgPrice = double.parse(
+      (widget.prices.reduce((a, b) => a + b) / widget.prices.length)
+          .toStringAsFixed(2),
+    );
     List<FlSpot> avgSpots = widget.dates.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), avgPrice);
     }).toList();
 
-    return _buildChartData(avgSpots, yInterval, maxY);
+    return _buildChartData(avgSpots);
   }
 
-  LineChartData _buildChartData(
-      List<FlSpot> spots, double yInterval, double maxY) {
+  LineChartData _buildChartData(List<FlSpot> spots) {
+    final maxPrice = widget.prices.reduce((a, b) => a > b ? a : b);
+    final maxY = _getMaxY(maxPrice);
+    final yInterval = _getYInterval(maxPrice);
+
     return LineChartData(
       gridData: FlGridData(
         show: true,

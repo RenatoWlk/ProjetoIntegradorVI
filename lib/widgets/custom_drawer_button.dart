@@ -5,13 +5,16 @@ class CustomDrawerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color backgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+
     return Builder(
       builder: (context) {
         return FloatingActionButton(
           onPressed: () {
             Scaffold.of(context).openEndDrawer();
           },
-          backgroundColor: Colors.white,
+          backgroundColor: backgroundColor,
           child: const Icon(Icons.person_outline, size: 50),
         );
       },
