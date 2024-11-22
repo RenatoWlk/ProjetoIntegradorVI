@@ -235,7 +235,17 @@ class LoginScreenState extends State<LoginScreen> {
       if (!context.mounted) return;
 
       if (success) {
-        Provider.of<UserProvider>(context, listen: false).setEmail(email);
+        var userDetails = await MongoDatabase.getUserDetails(email);
+
+        if (userDetails != null) {
+          if (!context.mounted) return;
+          Provider.of<UserProvider>(context, listen: false)
+            ..setEmail(userDetails['email'])
+            ..setName(userDetails['name'])
+            ..setTelephone(userDetails['telephone']);
+        }
+
+        if (!context.mounted) return;
         Provider.of<InvoiceProvider>(context, listen: false)
             .getInvoicesByEmail(email);
 

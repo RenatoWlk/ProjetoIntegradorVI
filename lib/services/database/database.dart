@@ -108,6 +108,45 @@ class MongoDatabase {
     }
   }
 
+  static Future<Map<String, dynamic>?> getUserDetails(String email) async {
+    Db db = await Db.create(dbURL);
+    try {
+      await db.open();
+      var collection = db.collection(usersCollectionName);
+
+      var user = await collection.findOne(where.eq('email', email));
+
+      if (user == null) {
+        if (kDebugMode) {
+          print('Usuário não encontrado!');
+        }
+        return null;
+      }
+
+      Map<String, dynamic> userDetails = {
+        'name': user['name'],
+        'email': user['email'],
+        'telephone': user['telephone']
+      };
+
+      if (kDebugMode) {
+        print('Dados do usuário: $userDetails');
+      }
+
+      return userDetails;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao tentar buscar os dados do usuário: $e');
+      }
+      return null;
+    } finally {
+      await db.close();
+      if (kDebugMode) {
+        print("Conexão fechada");
+      }
+    }
+  }
+
   static Future<bool> update(String email, String newPassword) async {
     Db db = await Db.create(dbURL);
     try {
@@ -175,17 +214,17 @@ class MongoDatabase {
         return false;
       }
 
-      // Atualiza a senha, se estiver nos dados
       if (updatedData.containsKey('password')) {
         updatedData['password'] =
             await encryption.hashPassword(updatedData['password']);
       }
 
-      // Realiza a atualização dos dados no banco
       var result = await collection.updateOne(
         where.eq('email', email),
-        modify.set('name', updatedData['name']),
-        // Adicione mais campos conforme necessário
+        modify
+            .set('name', updatedData['name'])
+            .set('telephone', updatedData['telephone'])
+            .set('email', updatedData['email']),
       );
 
       if (kDebugMode) {

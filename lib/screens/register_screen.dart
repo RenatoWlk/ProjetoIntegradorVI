@@ -8,13 +8,11 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Controllers para registrar usuário:
     final TextEditingController nomeController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController senhaController = TextEditingController();
     final TextEditingController telefoneController = TextEditingController();
 
-    // Validar o formulário:
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Scaffold(
