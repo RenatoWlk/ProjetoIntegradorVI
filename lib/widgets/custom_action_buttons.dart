@@ -25,6 +25,13 @@ class ActionButtons extends StatelessWidget {
     return bgColor;
   }
 
+  Color getIconColor(bool isDarkMode, Color bgColor) {
+    if (isDarkMode && bgColor != Colors.orange) {
+      return Colors.orange[500]!;
+    }
+    return Colors.black;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -36,19 +43,22 @@ class ActionButtons extends StatelessWidget {
           onPressed: onListPressed,
           backgroundColor: getBackgroundColor(isDarkMode, listButtonColor),
           heroTag: 'list_fab',
-          child: const Icon(Icons.list_alt, size: 40),
+          child: Icon(Icons.list_alt,
+              size: 40, color: getIconColor(isDarkMode, listButtonColor)),
         ),
         FloatingActionButton(
           onPressed: onScanPressed,
           backgroundColor: getBackgroundColor(isDarkMode, scanButtonColor),
           heroTag: 'scan_fab',
-          child: const Icon(Icons.document_scanner, size: 40),
+          child: Icon(Icons.document_scanner,
+              size: 40, color: getIconColor(isDarkMode, scanButtonColor)),
         ),
         FloatingActionButton(
           onPressed: onHistoryPressed,
           backgroundColor: getBackgroundColor(isDarkMode, historyButtonColor),
           heroTag: 'history_fab',
-          child: const Icon(Icons.history, size: 40),
+          child: Icon(Icons.history,
+              size: 40, color: getIconColor(isDarkMode, historyButtonColor)),
         ),
       ],
     );

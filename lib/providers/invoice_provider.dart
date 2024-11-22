@@ -13,6 +13,7 @@ class InvoiceProvider with ChangeNotifier {
       bool success = await MongoDatabase.addInvoice(invoice);
       if (success) {
         _invoices.add(invoice);
+        _sortInvoicesByDate();
         notifyListeners();
         return true;
       }
@@ -27,6 +28,7 @@ class InvoiceProvider with ChangeNotifier {
 
   void removeInvoice(int index) {
     _invoices.removeAt(index);
+    _sortInvoicesByDate();
     notifyListeners();
   }
 
@@ -40,6 +42,7 @@ class InvoiceProvider with ChangeNotifier {
       if (invoices.isNotEmpty) {
         _invoices.clear();
         _invoices.addAll(invoices);
+        _sortInvoicesByDate();
         notifyListeners();
         return true;
       }
@@ -52,5 +55,19 @@ class InvoiceProvider with ChangeNotifier {
       }
       return false;
     }
+  }
+
+  void _sortInvoicesByDate() {
+    _invoices.sort((a, b) {
+      return _parseDate(a.orderDate).compareTo(_parseDate(b.orderDate));
+    });
+  }
+
+  DateTime _parseDate(String date) {
+    List<String> parts = date.split('/');
+    int day = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int year = int.parse(parts[2]);
+    return DateTime(year, month, day);
   }
 }

@@ -7,6 +7,7 @@ class CustomDrawerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color backgroundColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+    Color iconColor = isDarkMode ? Colors.orange[500]! : Colors.black;
 
     return Builder(
       builder: (context) {
@@ -15,7 +16,7 @@ class CustomDrawerButton extends StatelessWidget {
             Scaffold.of(context).openEndDrawer();
           },
           backgroundColor: backgroundColor,
-          child: const Icon(Icons.person_outline, size: 50),
+          child: Icon(Icons.person_outline, size: 50, color: iconColor),
         );
       },
     );

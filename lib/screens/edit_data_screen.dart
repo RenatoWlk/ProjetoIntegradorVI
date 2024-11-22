@@ -11,28 +11,20 @@ class EditDataScreen extends StatefulWidget {
 }
 
 class _EditDataScreenState extends State<EditDataScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController telephoneController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    nameController.text =
-        Provider.of<UserProvider>(context, listen: false).name;
-    emailController.text =
-        Provider.of<UserProvider>(context, listen: false).email;
-    telephoneController.text =
-        Provider.of<UserProvider>(context, listen: false).telephone;
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController telephoneController = TextEditingController();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final TextEditingController nameController =
+        TextEditingController(text: userProvider.name);
+    final TextEditingController emailController =
+        TextEditingController(text: userProvider.email);
+    final TextEditingController telephoneController =
+        TextEditingController(text: userProvider.telephone);
 
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -130,7 +122,8 @@ class _EditDataScreenState extends State<EditDataScreen> {
                   // BOTÃO SALVAR
                   ElevatedButton(
                     onPressed: () async {
-                      saveUserData(context);
+                      saveUserData(context, formKey, nameController,
+                          emailController, telephoneController);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(255, 156, 0, 1),
@@ -170,10 +163,15 @@ class _EditDataScreenState extends State<EditDataScreen> {
     );
   }
 
-  Future<void> saveUserData(BuildContext context) async {
+  Future<void> saveUserData(
+      BuildContext context,
+      GlobalKey<FormState> formKey,
+      TextEditingController nameController,
+      TextEditingController emailController,
+      TextEditingController telephoneController) async {
     String userEmail = Provider.of<UserProvider>(context, listen: false).email;
 
-    if (_formKey.currentState!.validate()) {
+    if (formKey.currentState!.validate()) {
       Map<String, dynamic> updatedData = {
         'name': nameController.text.trim(),
         'email': emailController.text.trim(),

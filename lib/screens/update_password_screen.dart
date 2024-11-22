@@ -7,13 +7,11 @@ class UpdatePasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Controllers para registrar usuário:
     final TextEditingController emailController = TextEditingController();
     final TextEditingController senhaController = TextEditingController();
     final TextEditingController confirmarSenhaController =
         TextEditingController();
 
-    // Validar o formulário:
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Scaffold(
@@ -144,6 +142,24 @@ class UpdatePasswordScreen extends StatelessWidget {
                     child: const Text('Atualizar senha',
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // BOTÃO VOLTAR
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text('Voltar',
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

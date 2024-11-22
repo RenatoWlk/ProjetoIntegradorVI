@@ -226,6 +226,8 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void login(BuildContext context) async {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
     if (formKey.currentState != null && formKey.currentState!.validate()) {
       String email = emailController.text.trim();
       String password = passwordController.text.trim();
@@ -238,11 +240,9 @@ class LoginScreenState extends State<LoginScreen> {
         var userDetails = await MongoDatabase.getUserDetails(email);
 
         if (userDetails != null) {
-          if (!context.mounted) return;
-          Provider.of<UserProvider>(context, listen: false)
-            ..setEmail(userDetails['email'])
-            ..setName(userDetails['name'])
-            ..setTelephone(userDetails['telephone']);
+          userProvider.setEmail(userDetails['email']);
+          userProvider.setName(userDetails['name']);
+          userProvider.setTelephone(userDetails['telephone']);
         }
 
         if (!context.mounted) return;
