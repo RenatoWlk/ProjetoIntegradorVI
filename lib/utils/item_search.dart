@@ -27,6 +27,10 @@ class ItemSearch {
       }
     }
 
-    return bestMatch;
+    if (bestMatch != null) {
+      return bestMatch.toUpperCase();
+    } else {
+      return query.toUpperCase();
+    }
   }
 }

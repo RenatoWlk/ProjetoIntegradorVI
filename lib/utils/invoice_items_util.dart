@@ -34,7 +34,7 @@ class InvoiceItemsUtil {
     }
 
     for (var line in ocrText.split('\n')) {
-      if (hasSimilarKeyword(line, invoiceIdentifiers, 0.4)) {
+      if (hasSimilarKeyword(line, invoiceIdentifiers, 0.3)) {
         return true;
       }
     }
@@ -60,14 +60,19 @@ class InvoiceItemsUtil {
         continue;
       }
 
-      int? quantity;
-      int? selectedLineIndex;
-
-      _findPreviousLineDetails(
-          lines, i, namesAlreadyUsed, quantity, selectedLineIndex);
+      List<dynamic> details =
+          _findNameAndQuantityOnPreviousLines(name, lines, i, namesAlreadyUsed);
+      name = details[0];
+      int? quantity = details[1];
+      int? selectedLineIndex = details[2];
 
       if (name == null) {
-        _findNextLineDetails(lines, i, namesAlreadyUsed, quantity);
+        List<dynamic> details = _findNameAndQuantityOnNextLines(
+            name, quantity, lines, i, namesAlreadyUsed);
+        name = details[0];
+        quantity = details[1];
+        namesAlreadyUsed = details[2];
+        lines = details[3];
       }
 
       name = _findBestMatchForName(name, itemSearch);
@@ -75,6 +80,10 @@ class InvoiceItemsUtil {
 
       if (name != null && price != null) {
         items.add(createInvoiceItem(name, quantity, price));
+        if (selectedLineIndex != null) {
+          lines.removeAt(selectedLineIndex);
+          if (selectedLineIndex < i) i--;
+        }
         lines.removeAt(i);
       } else {
         i++;
@@ -84,40 +93,38 @@ class InvoiceItemsUtil {
     return items;
   }
 
-  void _findPreviousLineDetails(List<String> lines, int currentIndex,
-      List<String> namesAlreadyUsed, int? quantity, int? selectedLineIndex) {
-    for (int j = currentIndex - 1; j >= currentIndex - 3 && j >= 0; j--) {
+  List<dynamic> _findNameAndQuantityOnPreviousLines(String? name,
+      List<String> lines, int lineIndex, List<String> namesAlreadyUsed) {
+    for (int j = lineIndex - 1; j >= lineIndex - 3 && j >= 0; j--) {
       String? extractedName = extractItemName(lines[j]);
       int? extractedQuantity = extractItemQuantity(lines[j]);
 
       if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
-        selectedLineIndex = j;
-        quantity = extractedQuantity ?? quantity;
+        return [extractedName, extractedQuantity, j];
       }
     }
+    return [name, null, null];
   }
 
-  void _findNextLineDetails(List<String> lines, int currentIndex,
-      List<String> namesAlreadyUsed, int? quantity) {
-    for (int j = currentIndex + 1;
-        j <= currentIndex + 2 && j < lines.length;
-        j++) {
+  List<dynamic> _findNameAndQuantityOnNextLines(String? name, int? quantity,
+      List<String> lines, int lineIndex, List<String> namesAlreadyUsed) {
+    for (int j = lineIndex + 1; j <= lineIndex + 2 && j < lines.length; j++) {
       String? extractedName = extractItemName(lines[j]);
       int? extractedQuantity = extractItemQuantity(lines[j]);
 
       if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
         namesAlreadyUsed.add(extractedName);
-        quantity = extractedQuantity ?? quantity;
         lines.removeAt(j);
-        break;
+        return [extractedName, extractedQuantity, namesAlreadyUsed, lines];
       }
     }
+    return [name, quantity, namesAlreadyUsed, lines];
   }
 
   String? _findBestMatchForName(String? name, ItemSearch itemSearch) {
     if (name != null) {
       return itemSearch.searchItem(name.toLowerCase(),
-          similarityThreshold: 0.4);
+          similarityThreshold: 0.3);
     }
     return name;
   }
