@@ -1,6 +1,10 @@
 import 'package:string_similarity/string_similarity.dart';
 
 import 'package:projeto_integrador_6/models/invoice_item.dart';
+import 'package:projeto_integrador_6/utils/data/invoice_identifiers.dart';
+import 'package:projeto_integrador_6/utils/data/product_names.dart';
+import 'package:projeto_integrador_6/utils/data/unwanted_words.dart';
+import 'package:projeto_integrador_6/utils/item_search.dart';
 
 class InvoiceItemsUtil {
   static bool isInvoice(String ocrText) {
@@ -10,14 +14,6 @@ class InvoiceItemsUtil {
     if (regex.hasMatch(ocrText)) {
       return true;
     }
-
-    final List<String> keywords = [
-      'nf-e',
-      'nfc-e',
-      'nota fiscal',
-      'cupom fiscal',
-      'cupom fiscal eletronico',
-    ];
 
     bool hasSimilarKeyword(
         String text, List<String> keywords, double threshold) {
@@ -38,7 +34,7 @@ class InvoiceItemsUtil {
     }
 
     for (var line in ocrText.split('\n')) {
-      if (hasSimilarKeyword(line, keywords, 0.4)) {
+      if (hasSimilarKeyword(line, invoiceIdentifiers, 0.4)) {
         return true;
       }
     }
@@ -51,6 +47,7 @@ class InvoiceItemsUtil {
     List<String> namesAlreadyUsed = [];
     String formattedText = improveOCRFormatting(ocrText);
     List<String> lines = formattedText.split('\n');
+    ItemSearch itemSearch = ItemSearch(productNames);
 
     int i = 0;
     while (i < lines.length) {
@@ -66,42 +63,18 @@ class InvoiceItemsUtil {
       int? quantity;
       int? selectedLineIndex;
 
-      for (int j = i - 1; j >= i - 3 && j >= 0; j--) {
-        String? extractedName = extractItemName(lines[j]);
-        int? extractedQuantity = extractItemQuantity(lines[j]);
-
-        if (extractedName != null &&
-            !namesAlreadyUsed.contains(extractedName)) {
-          name = extractedName;
-          selectedLineIndex = j;
-          quantity = extractedQuantity ?? quantity;
-        }
-      }
+      _findPreviousLineDetails(
+          lines, i, namesAlreadyUsed, quantity, selectedLineIndex);
 
       if (name == null) {
-        for (int j = i + 1; j <= i + 2 && j < lines.length; j++) {
-          String? extractedName = extractItemName(lines[j]);
-          int? extractedQuantity = extractItemQuantity(lines[j]);
-
-          if (extractedName != null &&
-              !namesAlreadyUsed.contains(extractedName)) {
-            name = extractedName;
-            namesAlreadyUsed.add(name);
-            quantity = extractedQuantity ?? quantity;
-            lines.removeAt(j);
-            break;
-          }
-        }
+        _findNextLineDetails(lines, i, namesAlreadyUsed, quantity);
       }
 
+      name = _findBestMatchForName(name, itemSearch);
       quantity ??= 1;
+
       if (name != null && price != null) {
-        items.add(InvoiceItem(
-            itemName: name, itemQuantity: quantity, itemPrice: price));
-        if (selectedLineIndex != null) {
-          lines.removeAt(selectedLineIndex);
-          if (selectedLineIndex < i) i--;
-        }
+        items.add(createInvoiceItem(name, quantity, price));
         lines.removeAt(i);
       } else {
         i++;
@@ -111,6 +84,49 @@ class InvoiceItemsUtil {
     return items;
   }
 
+  void _findPreviousLineDetails(List<String> lines, int currentIndex,
+      List<String> namesAlreadyUsed, int? quantity, int? selectedLineIndex) {
+    for (int j = currentIndex - 1; j >= currentIndex - 3 && j >= 0; j--) {
+      String? extractedName = extractItemName(lines[j]);
+      int? extractedQuantity = extractItemQuantity(lines[j]);
+
+      if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
+        selectedLineIndex = j;
+        quantity = extractedQuantity ?? quantity;
+      }
+    }
+  }
+
+  void _findNextLineDetails(List<String> lines, int currentIndex,
+      List<String> namesAlreadyUsed, int? quantity) {
+    for (int j = currentIndex + 1;
+        j <= currentIndex + 2 && j < lines.length;
+        j++) {
+      String? extractedName = extractItemName(lines[j]);
+      int? extractedQuantity = extractItemQuantity(lines[j]);
+
+      if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
+        namesAlreadyUsed.add(extractedName);
+        quantity = extractedQuantity ?? quantity;
+        lines.removeAt(j);
+        break;
+      }
+    }
+  }
+
+  String? _findBestMatchForName(String? name, ItemSearch itemSearch) {
+    if (name != null) {
+      return itemSearch.searchItem(name.toLowerCase(),
+          similarityThreshold: 0.4);
+    }
+    return name;
+  }
+
+  InvoiceItem createInvoiceItem(String name, int quantity, double price) {
+    return InvoiceItem(
+        itemName: name, itemQuantity: quantity, itemPrice: price);
+  }
+
   String? extractItemName(String text) {
     final regex = RegExp(r'(?<!\d)[A-Za-z]{2,}[A-Za-z\d\s-.]+');
     var match = regex.firstMatch(text);
@@ -118,51 +134,6 @@ class InvoiceItemsUtil {
     if (match == null) return null;
 
     String name = match.group(0)!.trim();
-
-    final unwantedWords = [
-      'RS',
-      'R\$',
-      'UN',
-      'UNI',
-      'UNID',
-      'UNIT',
-      'L',
-      'X',
-      'F',
-      'T',
-      'I',
-      'K',
-      'T10',
-      'iuni',
-      'iun',
-      'i un',
-      'i uni',
-      'total',
-      'totai',
-      'extrato',
-      'atendente',
-      'subtotal',
-      'descontos',
-      'acrescimos',
-      'VL',
-      'descricao',
-      'descrica0',
-      'qtde',
-      'qtd',
-      'cupom',
-      'cupon',
-      'fiscal',
-      'eletronico',
-      'SAT',
-      'unit',
-      'st',
-      'Venda',
-      'cartao',
-      'contribuinte',
-      'CPF',
-      'CNPJ',
-      'valor',
-    ];
 
     for (var word in unwantedWords) {
       if (RegExp(r'\b' + word + r'\b', caseSensitive: false).hasMatch(name)) {
@@ -205,18 +176,10 @@ class InvoiceItemsUtil {
   }
 
   String improveOCRFormatting(String ocrText) {
-    final List<String> keywordsNfc = [
-      'nf-e'
-          'nfc-e',
-      'nota fiscal',
-      'cupom fiscal',
-      'cupom fiscal eletrônico'
-    ];
-
     final List<String> keywordsTotal = ['total', 'totai', 't0tal', 't0tai'];
 
     for (var line in ocrText.split('\n')) {
-      if (findSimilarKeyword(line, keywordsNfc, 0.6) != null) {
+      if (findSimilarKeyword(line, invoiceIdentifiers, 0.6) != null) {
         ocrText = ocrText.substring(ocrText.indexOf(line) + line.length).trim();
         break;
       }
