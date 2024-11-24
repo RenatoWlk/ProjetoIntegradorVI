@@ -6,7 +6,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
-import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
+import 'package:projeto_integrador_6/services/invoice_processing.dart';
 
 Future<void> pickAndProccessPdf(BuildContext context, OCRProvider ocrProvider,
     InvoiceItemsProvider invoiceItemsProvider) async {
@@ -39,15 +39,15 @@ Future<String> extractTextFromPdf(String path) async {
 
 Future<void> processPdfContent(BuildContext context, String text,
     OCRProvider ocrProvider, InvoiceItemsProvider invoiceItemsProvider) async {
-  bool isInvoice = InvoiceItemsUtil.isInvoice(text);
+  bool isInvoice = InvoiceProcessor.isInvoice(text);
 
   if (isInvoice) {
-    final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
+    final InvoiceProcessor invoiceProcessor = InvoiceProcessor();
     List<InvoiceItem> items =
-        invoiceItemsUtil.extractInvoiceItemsFromText(text);
+        invoiceProcessor.extractInvoiceItemsFromText(text);
     invoiceItemsProvider.addInvoiceItems(items);
     ocrProvider
-        .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));
+        .updateExtractedText(invoiceProcessor.invoiceItemsToString(items));
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

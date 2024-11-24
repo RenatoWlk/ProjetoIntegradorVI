@@ -6,7 +6,7 @@ import 'package:projeto_integrador_6/utils/data/product_names.dart';
 import 'package:projeto_integrador_6/utils/data/unwanted_words.dart';
 import 'package:projeto_integrador_6/utils/item_search.dart';
 
-class InvoiceItemsUtil {
+class InvoiceProcessor {
   static bool isInvoice(String ocrText) {
     final RegExp regex = RegExp(
         r'nfc-e|nota fiscal|cupom fiscal|cupom fiscal eletronico',
@@ -43,39 +43,42 @@ class InvoiceItemsUtil {
   }
 
   List<InvoiceItem> extractInvoiceItemsFromText(String ocrText) {
+    String formattedText = improveOCRFormatting(ocrText, 0.3);
+    List<String> lines = formattedText.split('\n');
     List<InvoiceItem> items = [];
     List<String> namesAlreadyUsed = [];
-    String formattedText = improveOCRFormatting(ocrText);
-    List<String> lines = formattedText.split('\n');
     ItemSearch itemSearch = ItemSearch(productNames);
+    final nameSimilarityThreshold = 0.4;
+    final unwantedSimilarityThreshold = 0.4;
 
     int i = 0;
     while (i < lines.length) {
       String line = lines[i];
       double? price = extractItemPrice(line);
-      String? name = extractItemName(line);
+      String? name = extractItemName(line, unwantedSimilarityThreshold);
 
       if (price == null && name == null) {
         lines.removeAt(i);
         continue;
       }
 
-      List<dynamic> details =
-          _findNameAndQuantityOnPreviousLines(name, lines, i, namesAlreadyUsed);
+      List<dynamic> details = _findNameAndQuantityOnPreviousLines(
+          name, lines, i, namesAlreadyUsed, unwantedSimilarityThreshold);
       name = details[0];
       int? quantity = details[1];
       int? selectedLineIndex = details[2];
 
       if (name == null) {
-        List<dynamic> details = _findNameAndQuantityOnNextLines(
-            name, quantity, lines, i, namesAlreadyUsed);
+        List<dynamic> details = _findNameAndQuantityOnNextLines(name, quantity,
+            lines, i, namesAlreadyUsed, unwantedSimilarityThreshold);
         name = details[0];
         quantity = details[1];
         namesAlreadyUsed = details[2];
         lines = details[3];
       }
 
-      name = _findBestMatchForName(name, itemSearch);
+      name = _findBestMatchForNameInProductNames(
+          name, itemSearch, nameSimilarityThreshold);
       quantity ??= 1;
 
       if (name != null && price != null) {
@@ -93,10 +96,15 @@ class InvoiceItemsUtil {
     return items;
   }
 
-  List<dynamic> _findNameAndQuantityOnPreviousLines(String? name,
-      List<String> lines, int lineIndex, List<String> namesAlreadyUsed) {
+  List<dynamic> _findNameAndQuantityOnPreviousLines(
+      String? name,
+      List<String> lines,
+      int lineIndex,
+      List<String> namesAlreadyUsed,
+      double unwantedSimilarityThreshold) {
     for (int j = lineIndex - 1; j >= lineIndex - 3 && j >= 0; j--) {
-      String? extractedName = extractItemName(lines[j]);
+      String? extractedName =
+          extractItemName(lines[j], unwantedSimilarityThreshold);
       int? extractedQuantity = extractItemQuantity(lines[j]);
 
       if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
@@ -106,10 +114,16 @@ class InvoiceItemsUtil {
     return [name, null, null];
   }
 
-  List<dynamic> _findNameAndQuantityOnNextLines(String? name, int? quantity,
-      List<String> lines, int lineIndex, List<String> namesAlreadyUsed) {
+  List<dynamic> _findNameAndQuantityOnNextLines(
+      String? name,
+      int? quantity,
+      List<String> lines,
+      int lineIndex,
+      List<String> namesAlreadyUsed,
+      double unwantedSimilarityThreshold) {
     for (int j = lineIndex + 1; j <= lineIndex + 2 && j < lines.length; j++) {
-      String? extractedName = extractItemName(lines[j]);
+      String? extractedName =
+          extractItemName(lines[j], unwantedSimilarityThreshold);
       int? extractedQuantity = extractItemQuantity(lines[j]);
 
       if (extractedName != null && !namesAlreadyUsed.contains(extractedName)) {
@@ -121,10 +135,11 @@ class InvoiceItemsUtil {
     return [name, quantity, namesAlreadyUsed, lines];
   }
 
-  String? _findBestMatchForName(String? name, ItemSearch itemSearch) {
+  String? _findBestMatchForNameInProductNames(
+      String? name, ItemSearch itemSearch, double nameSimilarityThreshold) {
     if (name != null) {
       return itemSearch.searchItem(name.toLowerCase(),
-          similarityThreshold: 0.3);
+          similarityThreshold: nameSimilarityThreshold);
     }
     return name;
   }
@@ -134,7 +149,7 @@ class InvoiceItemsUtil {
         itemName: name, itemQuantity: quantity, itemPrice: price);
   }
 
-  String? extractItemName(String text) {
+  String? extractItemName(String text, double unwantedSimilarityThreshold) {
     final regex = RegExp(r'(?<!\d)[A-Za-z]{2,}[A-Za-z\d\s-.]+');
     var match = regex.firstMatch(text);
 
@@ -142,14 +157,15 @@ class InvoiceItemsUtil {
 
     String name = match.group(0)!.trim();
 
-    for (var word in unwantedWords) {
-      if (RegExp(r'\b' + word + r'\b', caseSensitive: false).hasMatch(name)) {
+    for (var unwantedWord in unwantedWords) {
+      if (RegExp(r'\b' + unwantedWord + r'\b', caseSensitive: false)
+          .hasMatch(name)) {
         return null;
       }
 
       double similarity = StringSimilarity.compareTwoStrings(
-          name.toLowerCase(), word.toLowerCase());
-      if (similarity >= 0.4) {
+          name.toLowerCase(), unwantedWord.toLowerCase());
+      if (similarity >= unwantedSimilarityThreshold) {
         return null;
       }
     }
@@ -182,22 +198,23 @@ class InvoiceItemsUtil {
     return null;
   }
 
-  String improveOCRFormatting(String ocrText) {
-    final List<String> keywordsTotal = ['total', 'totai', 't0tal', 't0tai'];
-
+  String improveOCRFormatting(String ocrText, double threshold) {
     for (var line in ocrText.split('\n')) {
-      if (findSimilarKeyword(line, invoiceIdentifiers, 0.6) != null) {
+      if (findSimilarKeyword(line, invoiceIdentifiers, threshold) != null) {
         ocrText = ocrText.substring(ocrText.indexOf(line) + line.length).trim();
         break;
       }
     }
 
     List<int> totalPositions = [];
-    for (var match in keywordsTotal) {
-      int index = ocrText.toLowerCase().indexOf(match.toLowerCase());
-      while (index != -1) {
+    List<String> lines = ocrText.split('\n');
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String? similarWord = findSimilarKeyword(line, ['total'], threshold);
+      if (similarWord != null) {
+        int index = ocrText.indexOf(line);
         totalPositions.add(index);
-        index = ocrText.toLowerCase().indexOf(match.toLowerCase(), index + 1);
       }
     }
 

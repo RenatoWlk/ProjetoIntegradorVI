@@ -8,7 +8,6 @@ final List<String> productNames = [
   'abobrinha italiana',
   'abobrinha',
   'absorvente com abas',
-  'absorvente diário',
   'absorvente interno',
   'absorvente noturno',
   'absorvente',

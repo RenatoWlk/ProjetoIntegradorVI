@@ -6,9 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:projeto_integrador_6/models/invoice_item.dart';
 import 'package:projeto_integrador_6/providers/ocr_provider.dart';
 import 'package:projeto_integrador_6/providers/invoice_items_provider.dart';
+import 'package:projeto_integrador_6/services/invoice_processing.dart';
 import 'package:projeto_integrador_6/services/ocr_service.dart';
 import 'package:projeto_integrador_6/utils/dialogs/home_screen_dialogs.dart';
-import 'package:projeto_integrador_6/utils/invoice_items_util.dart';
 import 'package:projeto_integrador_6/utils/pdf_util.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer.dart';
 import 'package:projeto_integrador_6/widgets/custom_drawer_button.dart';
@@ -257,14 +257,14 @@ class _HomeScreenState extends State<HomeScreen> {
       InvoiceItemsProvider invoiceItemsProvider) async {
     try {
       String text = await ocrService.extractTextFromImage(imagePath);
-      bool isInvoice = InvoiceItemsUtil.isInvoice(text);
+      bool isInvoice = InvoiceProcessor.isInvoice(text);
       if (isInvoice) {
-        final InvoiceItemsUtil invoiceItemsUtil = InvoiceItemsUtil();
+        final InvoiceProcessor invoiceProcessor = InvoiceProcessor();
         List<InvoiceItem> items =
-            invoiceItemsUtil.extractInvoiceItemsFromText(text);
+            invoiceProcessor.extractInvoiceItemsFromText(text);
         invoiceItemsProvider.addInvoiceItems(items);
         ocrProvider
-            .updateExtractedText(invoiceItemsUtil.invoiceItemsToString(items));
+            .updateExtractedText(invoiceProcessor.invoiceItemsToString(items));
 
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

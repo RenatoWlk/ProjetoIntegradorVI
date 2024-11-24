@@ -14,7 +14,7 @@ class TopPurchasedItemsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = processInvoices(context);
+    final items = processInvoices(context, 0.5);
     var sortedItems = items
       ..sort((a, b) => b.totalQuantity.compareTo(a.totalQuantity));
 
@@ -159,51 +159,45 @@ class TopPurchasedItemsScreen extends StatelessWidget {
     );
   }
 
-  List<ItemData> processInvoices(BuildContext context) {
+  List<ItemData> processInvoices(BuildContext context, double threshold) {
     List<Invoice> invoices = Provider.of<InvoiceProvider>(context).invoices;
-    List<ItemData> processedItems = [];
+    Map<String, ItemData> processedItemsMap = {};
 
     for (var invoice in invoices) {
       for (var item in invoice.invoiceItems) {
-        if (processedItems.isEmpty) {
-          double unitPrice = item.itemPrice / item.itemQuantity;
-          ItemData newProcessedItem = ItemData(
-              name: item.itemName,
-              totalQuantity: item.itemQuantity,
-              dates: [invoice.orderDate],
-              prices: [unitPrice]);
-          processedItems.add(newProcessedItem);
-          continue;
-        }
+        double unitPrice = item.itemPrice / item.itemQuantity;
 
-        bool itemMatched = false;
-        for (int i = 0; i < processedItems.length; i++) {
-          double similarity = StringSimilarity.compareTwoStrings(
-              item.itemName, processedItems[i].name);
-          if (similarity >= 0.5) {
-            processedItems[i].totalQuantity += item.itemQuantity;
-            if (!processedItems[i].dates.contains(invoice.orderDate)) {
-              processedItems[i].dates.add(invoice.orderDate);
-            }
-            processedItems[i].prices.add(item.itemPrice / item.itemQuantity);
-            itemMatched = true;
-            break;
+        String? bestMatchKey;
+        double highestSimilarity = 0.0;
+
+        processedItemsMap.forEach((key, processedItem) {
+          double similarity =
+              StringSimilarity.compareTwoStrings(item.itemName, key);
+          if (similarity > highestSimilarity && similarity >= threshold) {
+            highestSimilarity = similarity;
+            bestMatchKey = key;
           }
-        }
+        });
 
-        if (!itemMatched) {
-          double unitPrice = item.itemPrice / item.itemQuantity;
-          ItemData newProcessedItem = ItemData(
-              name: item.itemName,
-              totalQuantity: item.itemQuantity,
-              dates: [invoice.orderDate],
-              prices: [unitPrice]);
-          processedItems.add(newProcessedItem);
+        if (bestMatchKey != null) {
+          ItemData existingItem = processedItemsMap[bestMatchKey]!;
+          existingItem.totalQuantity += item.itemQuantity;
+          if (!existingItem.dates.contains(invoice.orderDate)) {
+            existingItem.dates.add(invoice.orderDate);
+          }
+          existingItem.prices.add(unitPrice);
+        } else {
+          processedItemsMap[item.itemName] = ItemData(
+            name: item.itemName,
+            totalQuantity: item.itemQuantity,
+            dates: [invoice.orderDate],
+            prices: [unitPrice],
+          );
         }
       }
     }
 
-    processedItems.removeWhere((item) => item.dates.length <= 1);
-    return processedItems;
+    processedItemsMap.removeWhere((key, item) => item.dates.length <= 1);
+    return processedItemsMap.values.toList();
   }
 }
