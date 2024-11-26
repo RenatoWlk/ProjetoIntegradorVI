@@ -358,4 +358,28 @@ class MongoDatabase {
       }
     }
   }
+
+  static Future<bool> removeInvoice(String invoiceId) async {
+    Db db = await Db.create(dbURL);
+    try {
+      await db.open();
+      var collection = db.collection(invoicesCollectionName);
+
+      var result = await collection
+          .deleteOne(where.eq('title', ObjectId.fromHexString(invoiceId)));
+
+      if (kDebugMode) {
+        print('Resultado da remoção: ${result.nRemoved} documentos removidos');
+      }
+
+      return result.nRemoved > 0;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao remover invoice: $e');
+      }
+      return false;
+    } finally {
+      await db.close();
+    }
+  }
 }

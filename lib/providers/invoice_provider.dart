@@ -26,10 +26,22 @@ class InvoiceProvider with ChangeNotifier {
     }
   }
 
-  void removeInvoice(int index) {
-    _invoices.removeAt(index);
-    _sortInvoicesByDate();
-    notifyListeners();
+  Future<bool> removeInvoiceById(String invoiceId, int index) async {
+    try {
+      bool success = await MongoDatabase.removeInvoice(invoiceId);
+      if (success) {
+        _invoices.removeAt(index);
+        _sortInvoicesByDate();
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao remover invoice: $e");
+      }
+      return false;
+    }
   }
 
   Future<bool> getInvoicesByEmail(String email) async {

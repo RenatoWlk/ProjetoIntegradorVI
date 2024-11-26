@@ -149,12 +149,37 @@ class HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.info_outline, size: 35),
-              iconSize: 35,
-              onPressed: () {
-                showInvoiceDetailsDialog(context, invoice);
-              },
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.info_outline, size: 35),
+                  onPressed: () {
+                    showInvoiceDetailsDialog(context, invoice);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline,
+                      size: 35, color: Colors.red),
+                  onPressed: () async {
+                    final confirmed =
+                        await showDeleteConfirmationDialog(context);
+                    if (confirmed) {
+                      if (!context.mounted) return;
+                      final success = await Provider.of<InvoiceProvider>(
+                              context,
+                              listen: false)
+                          .removeInvoiceById(invoice.invoiceTitle, index);
+                      if (!success) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Erro ao remover a invoice.')),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
             ),
           ],
         ),

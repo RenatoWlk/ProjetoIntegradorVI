@@ -65,3 +65,27 @@ void showInvoiceDetailsDialog(BuildContext context, Invoice invoice) {
     },
   );
 }
+
+Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
+  return await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirmar Exclusão'),
+            content: const Text(
+                'Tem certeza de que deseja excluir esta nota fiscal?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Excluir'),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
+}
