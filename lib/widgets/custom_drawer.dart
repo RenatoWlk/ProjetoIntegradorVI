@@ -32,7 +32,7 @@ class CustomDrawer extends StatelessWidget {
           children: <Widget>[
             const SizedBox(height: 70.0),
 
-            // Ícone do usuário
+            // Ícone
             Container(
               width: 160,
               height: 160,
@@ -42,10 +42,9 @@ class CustomDrawer extends StatelessWidget {
                   color: Colors.orange,
                   width: 4.0,
                 ),
-              ),
-              child: const CircleAvatar(
-                radius: 80,
-                backgroundImage: AssetImage('assets/images/profile.png'),
+                image: DecorationImage(
+                  image: AssetImage('assets/images/logo.png'),
+                ),
               ),
             ),
 

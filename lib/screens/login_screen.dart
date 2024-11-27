@@ -71,9 +71,9 @@ class LoginScreenState extends State<LoginScreen> {
 
                     // TEXTO NOME DO APP
                     Text(
-                      'ANDRÉ MENDELECK LTDA.',
+                      'MinhaNotinha',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 30,
                         fontWeight: FontWeight.w700,
                       ),
                     )
