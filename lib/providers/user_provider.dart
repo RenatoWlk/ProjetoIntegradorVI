@@ -22,4 +22,11 @@ class UserProvider with ChangeNotifier {
     _telephone = telephone;
     notifyListeners();
   }
+
+  void logout() {
+    _email = '';
+    _name = '';
+    _telephone = '';
+    notifyListeners();
+  }
 }

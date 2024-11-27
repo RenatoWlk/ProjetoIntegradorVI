@@ -155,7 +155,7 @@ class CustomDrawer extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    Provider.of<UserProvider>(context, listen: false).setEmail('');
+    Provider.of<UserProvider>(context, listen: false).logout();
 
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
