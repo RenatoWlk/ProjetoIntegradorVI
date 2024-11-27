@@ -168,7 +168,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       final success = await Provider.of<InvoiceProvider>(
                               context,
                               listen: false)
-                          .removeInvoiceById(invoice.invoiceTitle, index);
+                          .removeInvoiceById(invoice.id, index);
                       if (!success) {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(

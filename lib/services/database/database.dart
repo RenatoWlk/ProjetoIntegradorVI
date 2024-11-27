@@ -295,26 +295,13 @@ class MongoDatabase {
     }
   }
 
-  static Future<bool> addInvoice(Invoice invoice) async {
+  static Future<ObjectId?> addInvoice(Invoice invoice) async {
     Db db = await Db.create(dbURL);
 
     try {
       await db.open();
       var invoicesCollection = db.collection(invoicesCollectionName);
       var usersCollection = db.collection(usersCollectionName);
-
-      var existingInvoice = await invoicesCollection.findOne({
-        'user_email': invoice.userEmail,
-        'order_date': invoice.orderDate,
-        'total_price': invoice.totalPrice,
-      });
-
-      if (existingInvoice != null) {
-        if (kDebugMode) {
-          print('Erro: Lista já existente!');
-        }
-        return false;
-      }
 
       var result = await invoicesCollection.insertOne({
         "user_email": invoice.userEmail,
@@ -325,13 +312,10 @@ class MongoDatabase {
       });
 
       if (!result.isSuccess) {
-        if (kDebugMode) {
-          print('Erro ao inserir nota fiscal.');
-        }
-        return false;
+        return null;
       }
 
-      var invoiceId = result.id;
+      var invoiceId = result.id as ObjectId;
 
       var updateResult = await usersCollection.updateOne(
         where.eq('email', invoice.userEmail),
@@ -339,39 +323,38 @@ class MongoDatabase {
       );
 
       if (!updateResult.isSuccess) {
-        if (kDebugMode) {
-          print('Erro ao atualizar o usuário com a nova nota fiscal');
-        }
-        return false;
+        return null;
       }
 
-      return true;
+      return invoiceId;
     } catch (e) {
       if (kDebugMode) {
         print("Erro ao adicionar nota fiscal: $e");
       }
-      return false;
+      return null;
     } finally {
       await db.close();
-      if (kDebugMode) {
-        print('Conexão fechada');
-      }
     }
   }
 
-  static Future<bool> removeInvoice(String invoiceId) async {
+  static Future<bool> removeInvoice(ObjectId? invoiceId) async {
     Db db = await Db.create(dbURL);
     try {
       await db.open();
-      var collection = db.collection(invoicesCollectionName);
-
-      var result = await collection
-          .deleteOne(where.eq('title', ObjectId.fromHexString(invoiceId)));
-
+      var invoicesCollection = db.collection(invoicesCollectionName);
+      var result = await invoicesCollection.deleteOne(
+        where.id(invoiceId!),
+      );
       if (kDebugMode) {
         print('Resultado da remoção: ${result.nRemoved} documentos removidos');
       }
-
+      if (result.nRemoved > 0) {
+        var usersCollection = db.collection(usersCollectionName);
+        await usersCollection.updateOne(
+          where.eq('invoices_ids', invoiceId),
+          modify.pull('invoices_ids', invoiceId),
+        );
+      }
       return result.nRemoved > 0;
     } catch (e) {
       if (kDebugMode) {

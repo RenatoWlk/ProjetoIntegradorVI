@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 import 'package:projeto_integrador_6/models/invoice.dart';
 import 'package:projeto_integrador_6/services/database/database.dart';
@@ -10,8 +11,9 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<bool> addInvoice(Invoice invoice) async {
     try {
-      bool success = await MongoDatabase.addInvoice(invoice);
-      if (success) {
+      ObjectId? newId = await MongoDatabase.addInvoice(invoice);
+      if (newId != null) {
+        invoice.id = newId;
         _invoices.add(invoice);
         _sortInvoicesByDate();
         notifyListeners();
@@ -26,7 +28,7 @@ class InvoiceProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> removeInvoiceById(String invoiceId, int index) async {
+  Future<bool> removeInvoiceById(ObjectId? invoiceId, int index) async {
     try {
       bool success = await MongoDatabase.removeInvoice(invoiceId);
       if (success) {

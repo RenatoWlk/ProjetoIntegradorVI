@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider/provider.dart';
 
 import 'package:projeto_integrador_6/models/invoice.dart';
@@ -197,6 +198,7 @@ void showSaveListDialog(BuildContext context) {
 
               if (title.isNotEmpty && date.isNotEmpty && totalPrice > 0) {
                 final newInvoice = Invoice(
+                  id: ObjectId(),
                   userEmail: userEmail,
                   invoiceTitle: title,
                   orderDate: date,
