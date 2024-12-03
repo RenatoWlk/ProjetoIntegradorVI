@@ -13,7 +13,7 @@ Aplicativo mobile desenvolvido em Flutter, focado em facilitar compras de mercad
 Faça download ou clone esse repo usando este link:
 
 ```
-https://github.com/zubairehman/flutter-boilerplate-project.git
+https://github.com/RenatoWlk/ProjetoIntegradorVI
 ```
 
 **2:**
